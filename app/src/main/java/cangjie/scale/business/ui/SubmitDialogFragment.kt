@@ -43,7 +43,7 @@ class SubmitDialogFragment : DialogFragment() {
         val lp = dialogWindow.attributes
         val displayMetrics = requireContext().resources.displayMetrics
 //        lp.height = (displayMetrics.heightPixels * 0.75f).toInt()
-        lp.width= (displayMetrics.widthPixels * 0.6f).toInt()
+        lp.width = (displayMetrics.widthPixels * 0.6f).toInt()
         dialogWindow.attributes = lp
     }
 
@@ -72,9 +72,13 @@ class SubmitDialogFragment : DialogFragment() {
             rb_type1.isChecked = false
         }
         submitBinding!!.tvSubmitName.text = "商品名称：" + data!![0].name
-        submitBinding!!.tvBuyCount.text = "收货价格：" + if (data[0].costPrice.isNullOrEmpty()) "0.00" else data[0].costPrice!!
+        submitBinding!!.tvBuyCount.text =
+            "收货价格：" + if (data[0].costPrice.isNullOrEmpty()) "0.00" else String.format(
+                "%.2f元",
+                data[0].costPrice!!.toFloat()
+            )
         submitBinding!!.tvSubmitTotal.text = "验收总数量：" + calTotal()
-        submitBinding!!.tvSendUnit.text="收货单位："+data!![0].receive_unit
+        submitBinding!!.tvSendUnit.text = "收货单位：" + data!![0].receive_unit
         requireActivity().dividerBuilder()
             .color(Color.parseColor("#cccccc"))
             .size(1, TypedValue.COMPLEX_UNIT_DIP)

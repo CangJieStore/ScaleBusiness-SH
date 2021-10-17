@@ -15,6 +15,7 @@ data class GoodsInfo(
     var receive_quantity: String,
     val deliver_price: String,
     val receive_loss: String,
+    val receive_price: String,
     val spec: String,
     val receive_date: String,
     val path: String,

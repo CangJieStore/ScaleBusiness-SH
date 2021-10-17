@@ -1,6 +1,7 @@
 package cangjie.scale.business.widget
 
 import android.content.Context
+import android.util.Log
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
@@ -35,6 +36,7 @@ class CalLessPopView(context: Context, info: GoodsInfo, listener: LessValueListe
         val receiveCount = findViewById<AppCompatEditText>(R.id.edit_match_count)
         val receivePrice = findViewById<AppCompatEditText>(R.id.edit_receive_price)
         item?.let {
+            Log.e("last", it.toString())
             findViewById<AppCompatTextView>(R.id.tv_goods_title).text = "商品名称:" + it.name
             findViewById<AppCompatTextView>(R.id.tv_goods_spec).text = "商品规格:" + it.spec
             findViewById<AppCompatTextView>(R.id.tv_buy_unit2).text = it.unit
@@ -46,6 +48,10 @@ class CalLessPopView(context: Context, info: GoodsInfo, listener: LessValueListe
                 receiveCount.setText(it.deliver_quantity)
                 receivePrice.isEnabled = false
                 receiveCount.isEnabled = false
+            }
+            if (it.repair_receive == "1") {
+                receivePrice.setText(it.deliver_price)
+                receiveCount.setText(it.deliver_quantity)
             }
         }
         findViewById<AppCompatButton>(R.id.btn_confirm).setOnClickListener {

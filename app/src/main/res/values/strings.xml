@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">食安云采购验收系统</string>
+    <string name="app_name">食安云采购验收</string>
     <string name="str_login_title">欢迎来到可视验收系统</string>
     <string name="hint_account">请输入账号</string>
     <string name="hint_password">请输入密码</string>

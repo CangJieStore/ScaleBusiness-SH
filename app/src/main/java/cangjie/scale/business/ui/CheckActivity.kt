@@ -256,6 +256,11 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             "已验数量：" + currentGoodsInfo!!.receive_quantity + currentGoodsInfo!!.unit
         mBinding.tvSacalUnit.text = currentGoodsInfo!!.unit
         mBinding.tvInputUnit.text = currentGoodsInfo!!.unit
+        if (!currentGoodsInfo!!.receive_price.isEmpty()) {
+            if (currentGoodsInfo!!.receive_price.toFloat() > 0) {
+                mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
+            }
+        }
         if (calType(currentGoodsInfo!!.unit) == 0) {
             mBinding.tvDeliveryType.text = "计量方式：计重"
             mBinding.tvDeliveryCurrent.visibility = View.VISIBLE

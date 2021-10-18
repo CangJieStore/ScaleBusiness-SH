@@ -37,8 +37,12 @@ class CheckAdapter :
                 } else {
                     "计数"
                 }
-
-            it.cbCalLoss.isEnabled = item.isRepair
+            if (item.receive_loss == "1") {
+                it.cbCalLoss.isChecked = true
+                it.cbCalLoss.isClickable = false
+            } else {
+                it.cbCalLoss.isEnabled = item.isRepair
+            }
             it.cbCalLoss.setOnCheckedChangeListener { _, p1 ->
                 if (p1) {
                     lessListener?.isLess(item)

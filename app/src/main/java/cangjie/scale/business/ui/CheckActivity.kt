@@ -251,15 +251,30 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private fun handlerSelected() {
         mBinding.tvDeliveryName.text = "商品名称：" + currentGoodsInfo!!.name
         mBinding.tvReceiveCount.text =
-            "配送数量：" + currentGoodsInfo!!.deliver_quantity + currentGoodsInfo!!.unit
+            "采购数量：" + currentGoodsInfo!!.deliver_quantity + currentGoodsInfo!!.unit
         mBinding.tvDeliveryCount.text =
             "已验数量：" + currentGoodsInfo!!.receive_quantity + currentGoodsInfo!!.unit
         mBinding.tvSacalUnit.text = currentGoodsInfo!!.unit
         mBinding.tvInputUnit.text = currentGoodsInfo!!.unit
-        if (!currentGoodsInfo!!.receive_price.isEmpty()) {
+        if (currentGoodsInfo!!.receive_loss.isNotEmpty()) {
+            currentGoodsInfo!!.isLess = currentGoodsInfo!!.receive_loss.toInt()
+        }
+        if (currentGoodsInfo!!.receive_price.isNotEmpty()) {
             if (currentGoodsInfo!!.receive_price.toFloat() > 0) {
-                mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
+                if (currentGoodsInfo!!.receive_loss == "1") {
+                    mBinding.tvReceivePrice.visibility = View.VISIBLE
+                    mBinding.llEditPrice.visibility = View.GONE
+                    mBinding.tvReceivePrice.text = (currentGoodsInfo!!.receive_price)
+                } else {
+                    mBinding.tvReceivePrice.visibility = View.GONE
+                    mBinding.llEditPrice.visibility = View.VISIBLE
+                    mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
+                }
             }
+        }
+        if (currentGoodsInfo!!.repair_receive == "1" && currentGoodsInfo!!.receive_loss == "1") {
+            currentGoodsInfo!!.matchCount = currentGoodsInfo!!.deliver_quantity
+            currentGoodsInfo!!.matchPrice = currentGoodsInfo!!.deliver_price
         }
         if (calType(currentGoodsInfo!!.unit) == 0) {
             mBinding.tvDeliveryType.text = "计量方式：计重"

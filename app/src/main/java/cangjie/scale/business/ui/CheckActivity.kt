@@ -880,12 +880,16 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                         }
                         Log.e("json--", Gson().toJson(it))
                         checkAdapter.setList(it.goods.filter { value -> value.receive_quantity.toFloat() == 0f || value.repair_receive == "1" })
-                        handlerSelected()
+                        if (checkAdapter.data.size > 0) {
+                            handlerSelected()
+                        }
                     } else {
                         checkAdapter.setList(it.goods.filter { value -> value.receive_quantity.toFloat() == 0f || value.repair_receive == "1" })
-                        currentGoodsInfo = checkAdapter.data[0]
-                        handlerSelected()
-                        checkPosition(currentGoodsInfo!!)
+                        if (checkAdapter.data.size > 0) {
+                            currentGoodsInfo = checkAdapter.data[0]
+                            handlerSelected()
+                            checkPosition(currentGoodsInfo!!)
+                        }
                     }
                 }
             }

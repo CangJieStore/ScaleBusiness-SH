@@ -34,7 +34,6 @@ class DateDialogFragment : DialogFragment() {
         dialogWindow!!.setGravity(Gravity.CENTER)
         val lp = dialogWindow.attributes
         val displayMetrics = requireContext().resources.displayMetrics
-        lp.height = (displayMetrics.heightPixels * 0.7f).toInt()
         lp.width = (displayMetrics.widthPixels * 0.6f).toInt()
         dialogWindow.attributes = lp
     }

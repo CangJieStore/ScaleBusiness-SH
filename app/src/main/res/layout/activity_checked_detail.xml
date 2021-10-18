@@ -248,19 +248,6 @@
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:gravity="center"
-                    android:text="入库类型"
-                    android:textColor="@color/black_3"
-                    android:textSize="@dimen/sp16" />
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/gray_c" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:gravity="center"
                     android:text="操作"

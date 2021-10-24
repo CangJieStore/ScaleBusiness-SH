@@ -107,6 +107,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         CheckedAdapter(object : CheckedAdapter.Action {
             override fun action(item: GoodsInfo) {
                 currentRepairGood = item
+                currentRepairGood!!.repair_receive = "1"
                 viewModel.again(item.id)
             }
         })
@@ -784,6 +785,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                         (if (currentGoodsInfo!!.isLess == 1) currentGoodsInfo!!.matchCount else currentGoodsInfo!!.deliver_quantity),
                         currentGoodsInfo!!.deliver_quantity,
                         currentGoodsInfo!!.unit,
+                        currentGoodsInfo!!.receive_quantity,
                         currentGoodsInfo!!.isLess,
                         currentGoodsInfo!!.matchCount,
                         currentGoodsInfo!!.matchPrice,
@@ -906,6 +908,9 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 if (it.goods.size > 0) {
                     if (currentRepairGood != null) {
                         currentGoodsInfo = currentRepairGood
+                        currentGoodsInfo!!.repair_receive = currentRepairGood!!.repair_receive
+                        currentGoodsInfo!!.matchCount = currentGoodsInfo!!.deliver_quantity
+                        currentGoodsInfo!!.matchPrice = currentGoodsInfo!!.deliver_price
                         it.goods.forEach { value ->
                             value.isRepair = value.id == currentRepairGood!!.id
                         }

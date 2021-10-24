@@ -20,7 +20,7 @@ data class GoodsInfo(
     val receive_date: String,
     val path: String,
     var batch: String,
-    val repair_receive: String,
+    var repair_receive: String,
     var isRepair: Boolean,
     var is_sorting: Int,
     var isLess: Int = 0,

@@ -15,8 +15,9 @@ data class SubmitInfo(
     val receive_count: String?,
     val delivery_count: String,
     val receive_unit: String,
-    val isLess: Int=0,
+    val receive_quant: String,
+    val isLess: Int = 0,
     val matchCount: String?,
     val matchPrice: String?,
     var costPrice: String?,
-):Serializable
+) : Serializable

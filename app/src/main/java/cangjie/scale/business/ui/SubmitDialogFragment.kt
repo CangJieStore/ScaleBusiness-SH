@@ -113,6 +113,7 @@ class SubmitDialogFragment : DialogFragment() {
             for (item in data) {
                 total += item.batch_count.toFloat()
             }
+            total += data[0].receive_quant.toFloat()
         }
         return total.toString()
     }

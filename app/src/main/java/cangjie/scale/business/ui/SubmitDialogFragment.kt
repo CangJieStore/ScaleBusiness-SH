@@ -42,7 +42,6 @@ class SubmitDialogFragment : DialogFragment() {
         dialogWindow!!.setGravity(Gravity.CENTER)
         val lp = dialogWindow.attributes
         val displayMetrics = requireContext().resources.displayMetrics
-//        lp.height = (displayMetrics.heightPixels * 0.75f).toInt()
         lp.width = (displayMetrics.widthPixels * 0.6f).toInt()
         dialogWindow.attributes = lp
     }
@@ -71,40 +70,41 @@ class SubmitDialogFragment : DialogFragment() {
             rb_type2.isChecked = true
             rb_type1.isChecked = false
         }
-        submitBinding!!.tvSubmitName.text = "商品名称：" + data!![0].name
-        submitBinding!!.tvBuyCount.text =
-            "收货价格：" + if (data[0].costPrice.isNullOrEmpty()) "0.00" else String.format(
-                "%.2f元",
-                data[0].costPrice!!.toFloat()
-            )
-        submitBinding!!.tvSubmitTotal.text = "验收总数量：" + calTotal()
-        submitBinding!!.tvSendUnit.text = "收货单位：" + data!![0].receive_unit
-        requireActivity().dividerBuilder()
-            .color(Color.parseColor("#cccccc"))
-            .size(1, TypedValue.COMPLEX_UNIT_DIP)
-            .showLastDivider()
-            .build()
-            .addTo(submitBinding!!.rySubmit)
-        submitBinding!!.adapter = submitAdapter
-        submitAdapter.setList(data)
-        submitBinding!!.btnSubmit.setOnClickListener {
-            if (action != null) {
-                dismiss()
-                val count = if (data[0].matchCount.isNullOrEmpty()) "" else data[0].matchCount!!
-                val price = if (data[0].matchPrice.isNullOrEmpty()) "" else data[0].matchPrice!!
-                val csPrice = if (data[0].costPrice.isNullOrEmpty()) "0.00" else data[0].costPrice!!
-                action!!.submit(
-                    data[0].id,
-                    connectTotal(),
-                    data[0].isLess,
-                    count,
-                    price,
-                    csPrice
+        if (data.size > 0) {
+            submitBinding!!.tvSubmitName.text = "商品名称：" + data[0].name
+            submitBinding!!.tvBuyCount.text =
+                "收货价格：" + if (data[0].costPrice.isNullOrEmpty()) "0.00" else String.format(
+                    "%.2f元",
+                    data[0].costPrice!!.toFloat()
                 )
+            submitBinding!!.tvSubmitTotal.text = "验收总数量：" + calTotal()
+            submitBinding!!.tvSendUnit.text = "收货单位：" + data[0].receive_unit
+            requireActivity().dividerBuilder()
+                .color(Color.parseColor("#cccccc"))
+                .size(1, TypedValue.COMPLEX_UNIT_DIP)
+                .showLastDivider()
+                .build()
+                .addTo(submitBinding!!.rySubmit)
+            submitBinding!!.adapter = submitAdapter
+            submitAdapter.setList(data)
+            submitBinding!!.btnSubmit.setOnClickListener {
+                if (action != null) {
+                    dismiss()
+                    val count = if (data[0].matchCount.isNullOrEmpty()) "" else data[0].matchCount!!
+                    val price = if (data[0].matchPrice.isNullOrEmpty()) "" else data[0].matchPrice!!
+                    val csPrice =
+                        if (data[0].costPrice.isNullOrEmpty()) "0.00" else data[0].costPrice!!
+                    action!!.submit(
+                        data[0].id,
+                        connectTotal(),
+                        data[0].isLess,
+                        count,
+                        price,
+                        csPrice
+                    )
+                }
             }
         }
-
-
     }
 
     private fun calTotal(): String {
@@ -118,7 +118,7 @@ class SubmitDialogFragment : DialogFragment() {
     }
 
     private fun connectTotal(): String {
-        var buffer = StringBuffer()
+        val buffer = StringBuffer()
         if (data.size > 0) {
             for (item in data) {
                 buffer.append(item.batch_count)

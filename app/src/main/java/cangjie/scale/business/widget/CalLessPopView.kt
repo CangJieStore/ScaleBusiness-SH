@@ -36,7 +36,6 @@ class CalLessPopView(context: Context, info: GoodsInfo, listener: LessValueListe
         val receiveCount = findViewById<AppCompatEditText>(R.id.edit_match_count)
         val receivePrice = findViewById<AppCompatEditText>(R.id.edit_receive_price)
         item?.let {
-            Log.e("last", it.toString())
             findViewById<AppCompatTextView>(R.id.tv_goods_title).text = "商品名称:" + it.name
             findViewById<AppCompatTextView>(R.id.tv_goods_spec).text = "商品规格:" + it.spec
             findViewById<AppCompatTextView>(R.id.tv_buy_unit2).text = it.unit

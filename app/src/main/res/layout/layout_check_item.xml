@@ -111,10 +111,11 @@
             android:layout_height="match_parent"
             android:layout_weight="0.4">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/cb_cal_loss"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_cal_loss"
+                android:layout_width="30dp"
+                android:padding="@dimen/dp5"
+                android:layout_height="30dp"
                 android:layout_centerInParent="true" />
 
         </RelativeLayout>

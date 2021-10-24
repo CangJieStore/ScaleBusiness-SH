@@ -34,6 +34,7 @@ import cangjie.scale.business.entity.GoodsInfo
 import cangjie.scale.business.entity.OrderInfo
 import cangjie.scale.business.entity.SubmitInfo
 import cangjie.scale.business.scale.FormatUtil
+import cangjie.scale.business.scale.ScaleModule
 import cangjie.scale.business.scale.SerialPortUtilForScale
 import cangjie.scale.business.vm.ScaleViewModel
 import cangjie.scale.business.widget.CalLessPopView
@@ -45,8 +46,11 @@ import com.cangjie.frame.kit.LuminosityAnalyzer
 import com.cangjie.frame.kit.RotationListener
 import com.cangjie.frame.kit.lib.ToastUtils
 import com.cangjie.frame.kit.show
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.listener.OnItemChildClickListener
 import com.fondesa.recyclerviewdivider.dividerBuilder
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.gyf.immersionbar.ktx.immersionBar
 import com.lxj.xpopup.XPopup
 import com.lxj.xpopup.enums.PopupPosition
@@ -145,6 +149,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             .addTo(mBinding.ryOrderChecked)
         mBinding.adapterCheck = checkAdapter
         mBinding.adapterChecked = checkedAdapter
+        checkAdapter.addChildClickViewIds(R.id.iv_cal_loss)
         checkAdapter.setOnItemClickListener { adapter, _, position ->
             val choosePosition = adapter.data[position] as GoodsInfo
             checkPosition(choosePosition)
@@ -156,50 +161,59 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 imgData.clear()
                 imgAdapter.data.clear()
                 imgAdapter.notifyDataSetChanged()
+                if (currentGoodsInfo!!.receive_loss != "1") {
+                    currentGoodsInfo!!.isLess = 0
+                    currentGoodsInfo!!.matchPrice = null
+                    currentGoodsInfo!!.matchCount = null
+                    currentGoodsInfo!!.costPrice = null
+                    checkAdapter.setDismissItem(currentGoodsInfo)
+                }
             }
             currentGoodsInfo = null
             currentGoodsInfo = choosePosition
             handlerSelected()
         }
-        checkAdapter.setCalLessListener(object : CheckAdapter.IsCalLessListener {
-            override fun isLess(info: GoodsInfo?) {
-                if (info == null) {
-                    currentGoodsInfo!!.isLess = 0
-                    mBinding.llEditPrice.visibility = View.VISIBLE
-                    mBinding.tvReceivePrice.visibility = View.GONE
-                } else {
-                    val popupView = XPopup.Builder(this@CheckActivity)
-                        .autoOpenSoftInput(false)
-                        .popupPosition(PopupPosition.Right)
-                        .dismissOnTouchOutside(false)
-                        .hasStatusBarShadow(false)
-                        .asCustom(
-                            CalLessPopView(
-                                this@CheckActivity,
-                                info,
-                                object : CalLessPopView.LessValueListener {
-                                    override fun value(count: String?, price: String?) {
-                                        if (count.isNullOrEmpty() && price.isNullOrEmpty()) {
-                                            currentGoodsInfo?.isLess = 0
-                                            checkAdapter.setDismissItem(info)
-                                            mBinding.llEditPrice.visibility = View.VISIBLE
-                                            mBinding.tvReceivePrice.visibility = View.GONE
-                                        } else {
-                                            mBinding.llEditPrice.visibility = View.GONE
-                                            mBinding.tvReceivePrice.visibility = View.VISIBLE
-                                            checkAdapter.data
-                                            currentGoodsInfo?.isLess = 1
-                                            currentGoodsInfo?.matchCount = count!!
-                                            currentGoodsInfo?.matchPrice = price!!
-                                        }
-                                        calCostPrice()
+        checkAdapter.setOnItemChildClickListener { adapter, view, position ->
+            if (currentGoodsInfo!!.isLess == 0) {
+                val popupView = XPopup.Builder(this@CheckActivity)
+                    .autoOpenSoftInput(true)
+                    .popupPosition(PopupPosition.Right)
+                    .dismissOnTouchOutside(false)
+                    .hasStatusBarShadow(false)
+                    .asCustom(
+                        CalLessPopView(
+                            this@CheckActivity,
+                            currentGoodsInfo!!,
+                            object : CalLessPopView.LessValueListener {
+                                override fun value(count: String?, price: String?) {
+                                    if (count.isNullOrEmpty() && price.isNullOrEmpty()) {
+                                        currentGoodsInfo?.isLess = 0
+                                        mBinding.llEditPrice.visibility = View.VISIBLE
+                                        mBinding.tvReceivePrice.visibility = View.GONE
+                                    } else {
+                                        mBinding.llEditPrice.visibility = View.GONE
+                                        mBinding.tvReceivePrice.visibility = View.VISIBLE
+                                        checkAdapter.setDismissItem(currentGoodsInfo!!)
+                                        currentGoodsInfo?.isLess = 1
+                                        currentGoodsInfo?.matchCount = count!!
+                                        currentGoodsInfo?.matchPrice = price!!
                                     }
-                                })
-                        )
-                    popupView.show()
-                }
+                                    calCostPrice()
+                                }
+                            })
+                    )
+                popupView.show()
+            } else {
+                currentGoodsInfo!!.isLess = 0
+                currentGoodsInfo!!.matchPrice = null
+                currentGoodsInfo!!.matchCount = null
+                currentGoodsInfo!!.costPrice = null
+                checkAdapter.setDismissItem(currentGoodsInfo)
+                mBinding.tvReceivePrice.visibility = View.GONE
+                mBinding.llEditPrice.visibility = View.VISIBLE
+                mBinding.editCurrentPrice.setText("")
             }
-        })
+        }
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         mBinding.ryImg.layoutManager = linearLayoutManager
@@ -213,11 +227,11 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         readDataReceiver = ReadDataReceiver()
         registerReceiver(
             readDataReceiver,
-            IntentFilter(cangjie.scale.business.scale.ScaleModule.WeightValueChanged)
+            IntentFilter(ScaleModule.WeightValueChanged)
         )
         registerReceiver(
             readDataReceiver,
-            IntentFilter(cangjie.scale.business.scale.ScaleModule.ERROR)
+            IntentFilter(ScaleModule.ERROR)
         )
     }
 
@@ -225,7 +239,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         Thread {
             SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
             try {
-                cangjie.scale.business.scale.ScaleModule.Instance(this@CheckActivity) //初始化称重模块
+                ScaleModule.Instance(this@CheckActivity) //初始化称重模块
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
                 runOnUiThread {
@@ -270,6 +284,10 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                     mBinding.llEditPrice.visibility = View.VISIBLE
                     mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
                 }
+            } else {
+                mBinding.tvReceivePrice.visibility = View.GONE
+                mBinding.llEditPrice.visibility = View.VISIBLE
+                mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
             }
         }
         if (currentGoodsInfo!!.repair_receive == "1" && currentGoodsInfo!!.receive_loss == "1") {
@@ -542,7 +560,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             preview = Preview.Builder()
                 .setTargetAspectRatio(screenAspectRatio)
@@ -594,7 +612,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     private fun returnZero() {
         try {
-            cangjie.scale.business.scale.ScaleModule.Instance(this).ZeroClear()
+            ScaleModule.Instance(this).ZeroClear()
         } catch (e: Exception) {
             ViewUtils.runOnUiThread {
                 ToastUtils.show("置零失败")
@@ -780,7 +798,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                         "已验数量：" + getDeliveryCount() + currentGoodsInfo!!.unit
                     imgAdapter.setList(imgData)
                     mBinding.ryImg.smoothScrollToPosition(imgAdapter.itemCount - 1)
-
                 }
             }
 
@@ -856,7 +873,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         canvas.rotate(degress.toFloat())
         var spacing = 0
         for (label in labels) {
-            Log.e("label", label);
             canvas.drawText(label, 20f, 35f + spacing.toFloat(), paint)
             spacing += 25
         }
@@ -882,7 +898,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     override fun subscribeModel(model: ScaleViewModel) {
         super.subscribeModel(model)
-        model.currentOrder.observe(this, androidx.lifecycle.Observer {
+        model.currentOrder.observe(this, {
             it?.let {
                 currentOrder = it
                 mBinding.info = currentOrder
@@ -921,7 +937,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     inner class ReadDataReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (cangjie.scale.business.scale.ScaleModule.ERROR == intent.action) {
+            if (ScaleModule.ERROR == intent.action) {
                 val error = intent.getStringExtra("error")
                 ToastUtils.show(error)
             } else {
@@ -934,10 +950,10 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private fun updateWeight() {
         try {
             val currentWeight = FormatUtil.roundByScale(
-                cangjie.scale.business.scale.ScaleModule.Instance(this@CheckActivity).RawValue - cangjie.scale.business.scale.ScaleModule.Instance(
+                ScaleModule.Instance(this@CheckActivity).RawValue - ScaleModule.Instance(
                     this@CheckActivity
                 ).TareWeight,
-                cangjie.scale.business.scale.ScaleModule.Instance(this@CheckActivity).SetDotPoint
+                ScaleModule.Instance(this@CheckActivity).SetDotPoint
             )
             if (currentDeliveryType == 1) {
                 mBinding.tvDeliveryCurrent.text = formatUnit(currentWeight)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="480dp"
+    android:layout_width="400dp"
     android:layout_height="match_parent"
     android:background="@color/white">
 
@@ -17,7 +17,7 @@
             android:layout_marginTop="@dimen/dp30"
             android:paddingStart="@dimen/dp30"
             android:textColor="@color/black"
-            android:textSize="@dimen/sp27" />
+            android:textSize="@dimen/sp20" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_goods_spec"
@@ -26,7 +26,7 @@
             android:layout_marginTop="@dimen/dp15"
             android:paddingStart="@dimen/dp30"
             android:textColor="@color/black"
-            android:textSize="@dimen/sp27" />
+            android:textSize="@dimen/sp20" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
                 android:layout_centerVertical="true"
                 android:text="采购数量:"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
 
             <LinearLayout
                 android:id="@+id/ll_edit_count"
@@ -65,7 +65,7 @@
                     android:inputType="numberDecimal"
                     android:textColor="@color/black_3"
                     android:textColorHint="#cccccc"
-                    android:textSize="@dimen/sp27" />
+                    android:textSize="@dimen/sp20" />
 
             </LinearLayout>
 
@@ -78,7 +78,7 @@
                 android:padding="@dimen/dp15"
                 android:text="斤"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -95,7 +95,7 @@
                 android:layout_centerVertical="true"
                 android:text="采购价格:"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -117,7 +117,7 @@
                     android:inputType="numberDecimal"
                     android:textColor="@color/black_3"
                     android:textColorHint="#cccccc"
-                    android:textSize="@dimen/sp27" />
+                    android:textSize="@dimen/sp20" />
 
             </LinearLayout>
 
@@ -130,7 +130,7 @@
                 android:padding="@dimen/dp15"
                 android:text="元"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
         </RelativeLayout>
 
         <View
@@ -152,7 +152,7 @@
                 android:layout_centerVertical="true"
                 android:text="配送数量:"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -174,7 +174,7 @@
                     android:inputType="numberDecimal"
                     android:textColor="@color/black_3"
                     android:textColorHint="#cccccc"
-                    android:textSize="@dimen/sp27" />
+                    android:textSize="@dimen/sp20" />
 
             </LinearLayout>
 
@@ -187,7 +187,7 @@
                 android:padding="@dimen/dp15"
                 android:text="斤"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -204,7 +204,7 @@
                 android:layout_centerVertical="true"
                 android:text="配送价格:"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -226,7 +226,7 @@
                     android:inputType="numberDecimal"
                     android:textColor="@color/black_3"
                     android:textColorHint="#cccccc"
-                    android:textSize="@dimen/sp27" />
+                    android:textSize="@dimen/sp20" />
 
             </LinearLayout>
 
@@ -239,7 +239,7 @@
                 android:padding="@dimen/dp15"
                 android:text="元"
                 android:textColor="@color/black"
-                android:textSize="@dimen/sp27" />
+                android:textSize="@dimen/sp20" />
         </RelativeLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -259,7 +259,7 @@
             android:background="#6AC75B"
             android:text="取消"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp24" />
+            android:textSize="@dimen/sp20" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_confirm"
@@ -269,7 +269,7 @@
             android:background="#F15252"
             android:text="确定"
             android:textColor="@color/white"
-            android:textSize="@dimen/sp24" />
+            android:textSize="@dimen/sp20" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

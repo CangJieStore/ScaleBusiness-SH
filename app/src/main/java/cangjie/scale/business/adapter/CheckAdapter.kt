@@ -1,5 +1,6 @@
 package cangjie.scale.business.adapter
 
+import android.util.Log
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.LayoutCheckItemBinding
 import cangjie.scale.business.entity.GoodsInfo
@@ -13,14 +14,6 @@ import com.chad.library.adapter.base.viewholder.BaseDataBindingHolder
 class CheckAdapter :
     BaseQuickAdapter<GoodsInfo, BaseDataBindingHolder<LayoutCheckItemBinding>>(R.layout.layout_check_item) {
 
-    private var selectPosition = 0
-
-    fun checkPosition(position: Int) {
-        selectPosition = position
-        notifyDataSetChanged()
-    }
-
-    private var lessListener: IsCalLessListener? = null
     private var dismissItem: GoodsInfo? = null
 
     override fun convert(holder: BaseDataBindingHolder<LayoutCheckItemBinding>, item: GoodsInfo) {
@@ -38,34 +31,25 @@ class CheckAdapter :
                     "计数"
                 }
             if (item.receive_loss == "1") {
-                it.cbCalLoss.isChecked = true
-                it.cbCalLoss.isClickable = false
+                it.ivCalLoss.setImageResource(R.mipmap.iv_check_checked)
+                it.ivCalLoss.isClickable = false
             } else {
-                it.cbCalLoss.isEnabled = item.isRepair
+                it.ivCalLoss.setImageResource(R.mipmap.iv_check_normal)
+                it.ivCalLoss.isClickable = item.isRepair
             }
-            it.cbCalLoss.setOnCheckedChangeListener { _, p1 ->
-                if (p1) {
-                    lessListener?.isLess(item)
-                } else {
-                    lessListener?.isLess(null)
-                }
-            }
+
             dismissItem?.let { dis ->
                 kotlin.run {
-                    if (dismissItem == item) {
-                        it.cbCalLoss.isChecked = false
+                    if (dis.id == item.id) {
+                        if (dis.isLess == 1) {
+                            it.ivCalLoss.setImageResource(R.mipmap.iv_check_checked)
+                        } else {
+                            it.ivCalLoss.setImageResource(R.mipmap.iv_check_normal)
+                        }
                     }
                 }
             }
         }
-    }
-
-    interface IsCalLessListener {
-        fun isLess(info: GoodsInfo?)
-    }
-
-    fun setCalLessListener(listener: IsCalLessListener) {
-        this.lessListener = listener
     }
 
     fun setDismissItem(item: GoodsInfo?) {

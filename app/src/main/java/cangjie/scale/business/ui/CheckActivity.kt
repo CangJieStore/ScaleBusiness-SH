@@ -96,7 +96,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private var currentOrder: OrderInfo? = null
     private var orderID: String? = null
     private var date: String? = null
-    private var stockMode = -1
     private var currentShell: Float = 0.00F
     private var currentRepairGood: GoodsInfo? = null
 
@@ -396,6 +395,19 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 if (submitList.size == 0) {
                     show(this@CheckActivity, 2000, "请先验收才能完成提交")
                     return
+                }
+                if (currentGoodsInfo!!.isLess == 0) {
+                    val price = mBinding.editCurrentPrice.text.toString()
+                    if (price.isEmpty()) {
+                        show(this@CheckActivity, 2000, "请输入收货价格完成提交")
+                        return
+                    } else {
+                        if (price.toFloat() == 0f) {
+                            show(this@CheckActivity, 2000, "请输入收货价格完成提交")
+                            return
+                        }
+                    }
+
                 }
                 val bundle = Bundle()
                 bundle.putSerializable("info", submitList)

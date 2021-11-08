@@ -30,6 +30,7 @@ class ScaleViewModel : BaseScaleViewModel() {
     var chooseDateFiled = ObservableField<String>()
     var currentOrder = MutableLiveData<OrderInfo>()
     var updateData = MutableLiveData<Update>()
+    var currentUnit = ObservableField("")
     private val books: LiveData<MutableList<SubmitOrder>>
 
     var showStatusFiled = ObservableField(0)
@@ -114,13 +115,13 @@ class ScaleViewModel : BaseScaleViewModel() {
 
     fun loadMain(date: String) {
         loading("获取订单...")
-        val params = mutableMapOf<String,Any>("day" to date)
+        val params = mutableMapOf<String, Any>("day" to date)
         postWithToken<MutableList<OrderInfo>>(Url.orders, params, 201)
     }
 
     fun loadDetail(id: String) {
         loading("获取订单...")
-        val params = mutableMapOf<String,Any>("order_id" to id)
+        val params = mutableMapOf<String, Any>("order_id" to id)
         postWithToken<MutableList<OrderInfo>>(Url.orders, params, 203)
     }
 
@@ -136,7 +137,8 @@ class ScaleViewModel : BaseScaleViewModel() {
         cPrice: String,
         count: String,
         price: String,
-        submitType: String
+        submitType: String,
+        unit: String
     ) {
         loading("提交中...")
         val params = mutableMapOf<String, Any>(
@@ -146,7 +148,8 @@ class ScaleViewModel : BaseScaleViewModel() {
             "price" to cPrice,
             "deliver_quantity" to count,
             "deliver_price" to price,
-            "type" to submitType
+            "type" to submitType,
+            "unit" to unit
         )
         postWithToken<Any>(Url.submit, params, 202)
 
@@ -154,13 +157,13 @@ class ScaleViewModel : BaseScaleViewModel() {
 
     fun clear(id: String) {
         loading("请求中...")
-        val params = mutableMapOf<String,Any>("id" to id)
+        val params = mutableMapOf<String, Any>("id" to id)
         postWithToken<Any>(Url.clear, params, 223)
     }
 
     fun again(id: String) {
         loading("请求中...")
-        val params = mutableMapOf<String,Any>("id" to id)
+        val params = mutableMapOf<String, Any>("id" to id)
         postWithToken<Any>(Url.again, params, 204)
     }
 

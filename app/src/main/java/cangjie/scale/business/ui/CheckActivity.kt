@@ -16,12 +16,16 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.MimeTypeMap
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import androidx.camera.core.*
 import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
+import androidx.core.view.marginStart
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import cangjie.scale.business.R
@@ -51,9 +55,12 @@ import com.chad.library.adapter.base.listener.OnItemChildClickListener
 import com.fondesa.recyclerviewdivider.dividerBuilder
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import com.lxj.xpopup.XPopup
+import com.lxj.xpopup.core.AttachPopupView
 import com.lxj.xpopup.enums.PopupPosition
+import com.lxj.xpopup.interfaces.OnSelectListener
 import com.permissionx.guolindev.PermissionX
 import io.reactivex.Single
 import io.reactivex.SingleObserver
@@ -61,6 +68,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.sp
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -134,7 +142,22 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
                 }
             }
-
+        mBinding.editCurrentPrice.setOnClickListener {
+            EditPriceDialogFragment("收货价格", "请输入...").setContentCallback(object :
+                EditPriceDialogFragment.ContentCallback {
+                override fun content(content: String?) {
+                    mBinding.editCurrentPrice.text = content
+                }
+            }).show(supportFragmentManager)
+        }
+        mBinding.editCurrentCount.setOnClickListener {
+            EditPriceDialogFragment("本次数量", "请输入...").setContentCallback(object :
+                EditPriceDialogFragment.ContentCallback {
+                override fun content(content: String?) {
+                    mBinding.editCurrentCount.text = content
+                }
+            }).show(supportFragmentManager)
+        }
         dividerBuilder()
             .color(Color.parseColor("#cccccc"))
             .size(1, TypedValue.COMPLEX_UNIT_DIP)
@@ -233,10 +256,14 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             readDataReceiver,
             IntentFilter(ScaleModule.ERROR)
         )
+        mBinding.rgUnit.setOnCheckedChangeListener { p0, p1 ->
+            viewModel.currentUnit.set(currentGoodsInfo!!.units[p1])
+        }
     }
 
     private fun initWeight() {
         Thread {
+            SerialPortUtilForScale.Instance().CloseSerialPort()
             SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
             try {
                 ScaleModule.Instance(this@CheckActivity) //初始化称重模块
@@ -263,13 +290,13 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     }
 
     private fun handlerSelected() {
+        viewModel.currentUnit.set(currentGoodsInfo!!.unit)
+        addUnit(currentGoodsInfo!!.units)
         mBinding.tvDeliveryName.text = "商品名称：" + currentGoodsInfo!!.name
         mBinding.tvReceiveCount.text =
-            "采购数量：" + currentGoodsInfo!!.deliver_quantity + currentGoodsInfo!!.unit
+            "采购数量：" + currentGoodsInfo!!.deliver_quantity
         mBinding.tvDeliveryCount.text =
-            "已验数量：" + currentGoodsInfo!!.receive_quantity + currentGoodsInfo!!.unit
-        mBinding.tvSacalUnit.text = currentGoodsInfo!!.unit
-        mBinding.tvInputUnit.text = currentGoodsInfo!!.unit
+            "已验数量：" + currentGoodsInfo!!.receive_quantity
         if (currentGoodsInfo!!.receive_loss.isNotEmpty()) {
             currentGoodsInfo!!.isLess = currentGoodsInfo!!.receive_loss.toInt()
         }
@@ -282,12 +309,12 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 } else {
                     mBinding.tvReceivePrice.visibility = View.GONE
                     mBinding.llEditPrice.visibility = View.VISIBLE
-                    mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
+                    mBinding.editCurrentPrice.text = currentGoodsInfo!!.receive_price
                 }
             } else {
                 mBinding.tvReceivePrice.visibility = View.GONE
                 mBinding.llEditPrice.visibility = View.VISIBLE
-                mBinding.editCurrentPrice.setText(currentGoodsInfo!!.receive_price)
+                mBinding.editCurrentPrice.text = currentGoodsInfo!!.receive_price
             }
         }
         if (currentGoodsInfo!!.repair_receive == "1" && currentGoodsInfo!!.receive_loss == "1") {
@@ -307,7 +334,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             currentDeliveryType = 2
             mBinding.tvDeliveryCurrent.visibility = View.GONE
             mBinding.tvCurrentWeight.text = "0.00"
-            mBinding.editCurrentCount.clearText()
+            mBinding.editCurrentCount.text = ""
             mBinding.llEditCount.visibility = View.VISIBLE
             mBinding.btnRemove.visibility = View.GONE
             mBinding.btnResetZero.visibility = View.GONE
@@ -321,6 +348,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         super.initImmersionBar()
         immersionBar {
             fullScreen(true)
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
             statusBarDarkFont(false)
             init()
         }
@@ -377,7 +405,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                     "已验数量：" + FormatUtil.roundByScale(
                         currentGoodsInfo!!.receive_quantity.toDouble(),
                         2
-                    ) + currentGoodsInfo!!.unit
+                    )
                 mBinding.editCurrentCount.setText("")
                 submitList.clear()
                 imgData.clear()
@@ -432,7 +460,8 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                             isLess: Int,
                             dCount: String,
                             dPrice: String,
-                            cPrice: String
+                            cPrice: String,
+                            unit: String
                         ) {
                             viewModel.submit(
                                 id,
@@ -441,7 +470,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                                 cPrice,
                                 dCount,
                                 dPrice,
-                                currentGoodsInfo!!.repair_receive
+                                currentGoodsInfo!!.repair_receive, unit
                             )
                         }
                     }).show(supportFragmentManager, "submit")
@@ -490,7 +519,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 currentGoodsInfo!!.receive_quantity = "0.00"
                 currentGoodsInfo!!.batch = ""
                 mBinding.tvDeliveryCount.text =
-                    "已验数量：0.00" + currentGoodsInfo!!.unit
+                    "已验数量：0.00"
                 checkedAdapter.remove(currentGoodsInfo!!)
                 checkedAdapter.notifyDataSetChanged()
 
@@ -670,12 +699,12 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                         labels.add("验收时间:" + createTimeSdf1.format(Date()))
                         labels.add("商品名称:" + currentGoodsInfo!!.name)
                         if (currentGoodsInfo!!.isLess == 1) {
-                            labels.add("配送数量:" + currentGoodsInfo!!.matchCount + currentGoodsInfo!!.unit)
+                            labels.add("采购数量:" + currentGoodsInfo!!.matchCount + viewModel.currentUnit.get())
                         } else {
-                            labels.add("配送数量:" + currentGoodsInfo!!.deliver_quantity + currentGoodsInfo!!.unit)
+                            labels.add("采购数量:" + currentGoodsInfo!!.deliver_quantity + viewModel.currentUnit.get())
                         }
                         labels.add("验收批次:" + (imgData.size + reBatch + 1).toString())
-                        labels.add("本批数量:" + currentWeight + currentGoodsInfo!!.unit)
+                        labels.add("本批数量:" + currentWeight + viewModel.currentUnit.get())
                         makeWater(photoFile, labels, imgData.size + reBatch, currentWeight)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             setGalleryThumbnail(savedUri)
@@ -796,7 +825,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                         currentGoodsInfo!!.name,
                         (if (currentGoodsInfo!!.isLess == 1) currentGoodsInfo!!.matchCount else currentGoodsInfo!!.deliver_quantity),
                         currentGoodsInfo!!.deliver_quantity,
-                        currentGoodsInfo!!.unit,
+                        viewModel.currentUnit.get()!!,
                         currentGoodsInfo!!.receive_quantity,
                         currentGoodsInfo!!.isLess,
                         currentGoodsInfo!!.matchCount,
@@ -807,9 +836,9 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 imgData.add(path)
                 runOnUiThread {
                     calCostPrice()
-                    mBinding.editCurrentCount.setText("")
+                    mBinding.editCurrentCount.text = ""
                     mBinding.tvDeliveryCount.text =
-                        "已验数量：" + getDeliveryCount() + currentGoodsInfo!!.unit
+                        "已验数量：" + getDeliveryCount()
                     imgAdapter.setList(imgData)
                     mBinding.ryImg.smoothScrollToPosition(imgAdapter.itemCount - 1)
                 }
@@ -983,6 +1012,31 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             ee.printStackTrace()
             ToastUtils.show(ee.message!!)
         }
+    }
+
+    private fun addUnit(units: MutableList<String>) {
+        mBinding.rgUnit.removeAllViews()
+        for (index in 0 until units.size) {
+            val item = units[index]
+            val radioButton = RadioButton(this@CheckActivity)
+            radioButton.textSize = sp(18).toFloat()
+            radioButton.text = item
+            radioButton.id = index
+            if (item == viewModel.currentUnit.get()) {
+                radioButton.isChecked = true
+            }
+            if (index != 0) {
+                val params = RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.WRAP_CONTENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT
+                )
+                params.marginStart = sp(5)
+                radioButton.layoutParams = params
+            }
+            mBinding.rgUnit.addView(radioButton)
+
+        }
+
     }
 
 }

@@ -46,7 +46,6 @@ class CheckedFragment : BaseMvvmFragment<FragmentChekedBinding, ScaleViewModel>(
             .build()
             .addTo(mBinding!!.ryOrders)
         mBinding!!.adapter = orderAdapter
-        netTime()
         orderAdapter.setOnItemClickListener { adapter, view, position ->
             val intent = Intent(requireActivity(), CheckedDetailActivity::class.java)
             val info = adapter.data[position] as OrderInfo

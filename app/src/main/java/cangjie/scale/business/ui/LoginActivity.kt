@@ -2,12 +2,14 @@ package cangjie.scale.business.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.ActivityLoginBinding
 import cangjie.scale.business.vm.ScaleViewModel
 import com.cangjie.frame.core.BaseMvvmActivity
 import com.cangjie.frame.core.event.MsgEvent
 import com.cangjie.frame.kit.show
+import com.gyf.immersionbar.BarHide
 
 import com.gyf.immersionbar.ktx.immersionBar
 
@@ -27,10 +29,10 @@ class LoginActivity : BaseMvvmActivity<ActivityLoginBinding, ScaleViewModel>() {
 
     override fun layoutId(): Int = R.layout.activity_login
     override fun initImmersionBar() {
-        super.initImmersionBar()
         immersionBar {
             fullScreen(true)
-            statusBarDarkFont(true, 0.2f)
+            hideBar(BarHide.FLAG_HIDE_BAR)
+            keyboardEnable(true)
             init()
         }
     }

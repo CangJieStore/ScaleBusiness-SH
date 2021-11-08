@@ -14,6 +14,8 @@ import cangjie.scale.business.adapter.SubmitAdapter
 import cangjie.scale.business.databinding.DialogSubmitBinding
 import cangjie.scale.business.entity.SubmitInfo
 import com.fondesa.recyclerviewdivider.dividerBuilder
+import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ktx.immersionBar
 import kotlinx.android.synthetic.main.dialog_submit.*
 
 /**
@@ -37,6 +39,10 @@ class SubmitDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+        immersionBar {
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+            init()
+        }
         dialog!!.setCanceledOnTouchOutside(false)
         val dialogWindow = dialog!!.window
         dialogWindow!!.setGravity(Gravity.CENTER)
@@ -100,7 +106,8 @@ class SubmitDialogFragment : DialogFragment() {
                         data[0].isLess,
                         count,
                         price,
-                        csPrice
+                        csPrice,
+                        data[0].receive_unit
                     )
                 }
             }
@@ -136,7 +143,8 @@ class SubmitDialogFragment : DialogFragment() {
             isLess: Int,
             dCount: String,
             dPrice: String,
-            costPrice: String
+            costPrice: String,
+            unit: String
         )
     }
 

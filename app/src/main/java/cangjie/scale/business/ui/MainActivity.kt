@@ -2,6 +2,7 @@ package cangjie.scale.business.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import cangjie.scale.business.R
 import cangjie.scale.business.base.BaseFragmentPagerAdapter
@@ -13,16 +14,19 @@ import cangjie.scale.business.entity.Update
 import cangjie.scale.business.service.InitService
 import cangjie.scale.business.vm.ScaleViewModel
 import com.cangjie.frame.core.BaseMvvmActivity
+import com.cangjie.frame.core.NetUtils
 import com.cangjie.frame.core.event.MsgEvent
 import com.cangjie.frame.kit.show
 import com.cangjie.frame.kit.update.model.DownloadInfo
 import com.cangjie.frame.kit.update.model.TypeConfig
 import com.cangjie.frame.kit.update.utils.AppUpdateUtils
+import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
 import kotlinx.coroutines.launch
 
 import org.greenrobot.eventbus.EventBus
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
@@ -47,7 +51,9 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
         mBinding.vpOrders.adapter = mAdapter
         mBinding.tabOrders.setViewPager(mBinding.vpOrders)
         mBinding.tabOrders.currentTab = 0
-        netTime()
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val date = Date(System.currentTimeMillis())
+        viewModel.chooseDateFiled.set(simpleDateFormat.format(date))
     }
 
     private fun netTime() {
@@ -72,6 +78,8 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
         super.initImmersionBar()
         immersionBar {
             fullScreen(true)
+            hideBar(BarHide.FLAG_HIDE_BAR)
+            keyboardEnable(true)
             statusBarDarkFont(false)
             init()
         }
@@ -146,7 +154,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
 
     override fun subscribeModel(model: ScaleViewModel) {
         super.subscribeModel(model)
-        model.getUpdate().observe(this, androidx.lifecycle.Observer {
+        model.getUpdate().observe(this, {
             it?.let {
                 update(it)
             }

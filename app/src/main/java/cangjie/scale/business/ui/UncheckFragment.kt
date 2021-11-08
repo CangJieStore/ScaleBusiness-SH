@@ -44,7 +44,7 @@ class UncheckFragment : BaseMvvmFragment<FragmentUncheckBinding, ScaleViewModel>
             .showLastDivider()
             .build()
             .addTo(mBinding!!.ryOrders)
-        netTime()
+//        netTime()
         mBinding!!.adapter = orderAdapter
         orderAdapter.setOnItemClickListener { adapter, view, position ->
             val intent = Intent(requireActivity(), CheckActivity::class.java)

@@ -24,4 +24,6 @@
 
     <color name="capture_status_bar_color">#00000000</color>
     <color name="capture_navigation_bar_color">#00000000</color>
+    <color name="key_ok_color">#52A645</color>
+    <color name="key_ok_color_pressed">#3F52A645</color>
 </resources>

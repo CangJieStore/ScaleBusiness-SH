@@ -269,7 +269,7 @@
                                         android:layout_height="match_parent"
                                         android:layout_weight="0.6"
                                         android:gravity="center"
-                                        android:text="单位"
+                                        android:text="采购单位"
                                         android:textColor="@color/black_3"
                                         android:textSize="@dimen/sp16" />
 
@@ -509,7 +509,7 @@
                                     android:layout_alignParentEnd="true"
                                     android:layout_centerVertical="true"
                                     android:padding="@dimen/dp10"
-                                    android:text="斤"
+                                    android:text="@{checkModel.currentUnit}"
                                     android:textColor="@color/black_3"
                                     android:textSize="@dimen/sp24" />
                             </RelativeLayout>
@@ -554,22 +554,72 @@
                                 android:textColor="@color/black_3"
                                 android:textSize="@dimen/sp18" />
 
-
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tv_receive_count"
+                            <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="@dimen/dp5"
-                                android:textColor="@color/black_3"
-                                android:textSize="@dimen/sp18" />
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                            <androidx.appcompat.widget.AppCompatTextView
-                                android:id="@+id/tv_delivery_count"
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tv_delivery_unit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="收货单位："
+                                    android:textColor="@color/black_3"
+                                    android:textSize="@dimen/sp18" />
+
+                                <RadioGroup
+                                    android:id="@+id/rg_unit"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal" />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="@dimen/dp5"
-                                android:textColor="@color/black_3"
-                                android:textSize="@dimen/sp18" />
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tv_receive_count"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/black_3"
+                                    android:textSize="@dimen/sp18" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="@dimen/dp5"
+                                    android:text="@{checkModel.currentUnit}"
+                                    android:textColor="@color/black_3"
+                                    android:textSize="@dimen/sp18" />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
+
+                            <androidx.appcompat.widget.LinearLayoutCompat
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/dp5"
+                                android:orientation="horizontal">
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:id="@+id/tv_delivery_count"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/black_3"
+                                    android:textSize="@dimen/sp18" />
+
+                                <androidx.appcompat.widget.AppCompatTextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:padding="@dimen/dp5"
+                                    android:text="@{checkModel.currentUnit}"
+                                    android:textColor="@color/black_3"
+                                    android:textSize="@dimen/sp18" />
+                            </androidx.appcompat.widget.LinearLayoutCompat>
 
                         </LinearLayout>
 
@@ -606,11 +656,11 @@
                                 <LinearLayout
                                     android:id="@+id/ll_edit_price"
                                     android:layout_width="100dp"
-                                    android:layout_height="40dp"
+                                    android:layout_height="30dp"
                                     android:gravity="center_vertical"
                                     android:orientation="horizontal">
 
-                                    <androidx.appcompat.widget.AppCompatEditText
+                                    <androidx.appcompat.widget.AppCompatTextView
                                         android:id="@+id/edit_current_price"
                                         android:layout_width="100dp"
                                         android:layout_height="match_parent"
@@ -670,11 +720,12 @@
                                     <LinearLayout
                                         android:id="@+id/ll_edit_count"
                                         android:layout_width="wrap_content"
-                                        android:layout_height="40dp"
+                                        android:layout_height="30dp"
+                                        android:clickable="true"
                                         android:gravity="center_vertical"
                                         android:orientation="horizontal">
 
-                                        <androidx.appcompat.widget.AppCompatEditText
+                                        <androidx.appcompat.widget.AppCompatTextView
                                             android:id="@+id/edit_current_count"
                                             android:layout_width="100dp"
                                             android:layout_height="match_parent"
@@ -693,6 +744,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:padding="@dimen/dp5"
+                                        android:text="@{checkModel.currentUnit}"
                                         android:textColor="@color/black_3"
                                         android:textSize="@dimen/sp18" />
                                 </LinearLayout>
@@ -719,9 +771,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dp10"
+                            android:layout_marginBottom="@dimen/dp10"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-                            android:padding="@dimen/dp15">
+                            android:paddingStart="@dimen/dp15"
+                            android:paddingEnd="@dimen/dp15">
 
                             <androidx.appcompat.widget.AppCompatButton
                                 android:layout_width="0dp"

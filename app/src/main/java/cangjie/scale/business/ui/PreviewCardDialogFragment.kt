@@ -9,6 +9,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.DialogPreviewImgBinding
+import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ktx.immersionBar
 
 
 /**
@@ -29,13 +31,17 @@ class PreviewCardDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+        immersionBar {
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+            init()
+        }
         dialog!!.setCanceledOnTouchOutside(false)
         val dialogWindow = dialog!!.window
         dialogWindow!!.setGravity(Gravity.CENTER)
         val lp = dialogWindow.attributes
         val displayMetrics = requireContext().resources.displayMetrics
         lp.height = (displayMetrics.heightPixels * 0.8f).toInt()
-        lp.width=(displayMetrics.widthPixels * 0.7f).toInt()
+        lp.width = (displayMetrics.widthPixels * 0.7f).toInt()
         dialogWindow.attributes = lp
     }
 

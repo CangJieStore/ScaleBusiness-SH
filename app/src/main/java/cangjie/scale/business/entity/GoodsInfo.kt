@@ -19,6 +19,7 @@ data class GoodsInfo(
     val spec: String,
     val receive_date: String,
     val path: String,
+    var units: MutableList<String>,
     var batch: String,
     var repair_receive: String,
     var isRepair: Boolean,

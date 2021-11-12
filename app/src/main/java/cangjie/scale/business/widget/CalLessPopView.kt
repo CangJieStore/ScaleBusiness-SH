@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatTextView
 import cangjie.scale.business.R
 import cangjie.scale.business.entity.GoodsInfo
+import com.gyf.immersionbar.ImmersionBar
 import com.lxj.xpopup.core.DrawerPopupView
 
 /**

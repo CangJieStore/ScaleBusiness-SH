@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.FragmentChooseDateBinding
+import com.gyf.immersionbar.ktx.destroyImmersionBar
 
 
 /**
@@ -75,6 +76,10 @@ class DateDialogFragment : DialogFragment() {
         return this
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog?.let { destroyImmersionBar(it) }
+    }
 
     companion object {
         fun newInstance(args: Bundle?): DateDialogFragment {

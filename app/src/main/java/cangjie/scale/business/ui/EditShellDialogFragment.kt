@@ -13,7 +13,7 @@ import cangjie.scale.business.R
 import cangjie.scale.business.adapter.SubmitAdapter
 import cangjie.scale.business.databinding.DialogEditShellBinding
 import com.blankj.utilcode.util.KeyboardUtils.showSoftInput
-
+import com.gyf.immersionbar.ktx.destroyImmersionBar
 
 
 /**
@@ -108,6 +108,10 @@ class EditShellDialogFragment : DialogFragment() {
         return this
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog?.let { destroyImmersionBar(it) }
+    }
 
     companion object {
         fun newInstance(args: Bundle?): EditShellDialogFragment? {

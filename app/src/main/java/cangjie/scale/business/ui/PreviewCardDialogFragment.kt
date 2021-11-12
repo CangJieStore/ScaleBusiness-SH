@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.DialogPreviewImgBinding
 import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ktx.destroyImmersionBar
 import com.gyf.immersionbar.ktx.immersionBar
 
 
@@ -64,6 +65,10 @@ class PreviewCardDialogFragment : DialogFragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog?.let { destroyImmersionBar(it) }
+    }
 
     companion object {
         fun newInstance(args: Bundle?): PreviewCardDialogFragment? {

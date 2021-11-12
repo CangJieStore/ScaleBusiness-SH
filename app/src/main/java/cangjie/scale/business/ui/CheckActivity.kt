@@ -32,6 +32,7 @@ import cangjie.scale.business.R
 import cangjie.scale.business.adapter.CheckAdapter
 import cangjie.scale.business.adapter.CheckedAdapter
 import cangjie.scale.business.adapter.ImageAdapter
+import cangjie.scale.business.base.workOnIO
 import cangjie.scale.business.databinding.ActivityCheckBinding
 import cangjie.scale.business.db.SubmitOrder
 import cangjie.scale.business.entity.GoodsInfo
@@ -46,6 +47,7 @@ import com.blankj.utilcode.util.ViewUtils
 import com.cangjie.frame.core.BaseMvvmActivity
 import com.cangjie.frame.core.clearText
 import com.cangjie.frame.core.event.MsgEvent
+import com.cangjie.frame.core.net.annotation.NetType
 import com.cangjie.frame.kit.LuminosityAnalyzer
 import com.cangjie.frame.kit.RotationListener
 import com.cangjie.frame.kit.lib.ToastUtils
@@ -129,19 +131,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         orderID = intent.getSerializableExtra("id") as String
         viewModel.loadDetail(orderID!!)
         date = intent.getStringExtra("date")
-        PermissionX.init(this@CheckActivity)
-            .permissions(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            .request { allGranted, grantedList, deniedList ->
-                if (allGranted) {
-                    initCamera()
-                } else {
-
-                }
-            }
+        initCamera()
         mBinding.editCurrentPrice.setOnClickListener {
             EditPriceDialogFragment("收货价格", "请输入...").setContentCallback(object :
                 EditPriceDialogFragment.ContentCallback {
@@ -209,6 +199,10 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                             currentGoodsInfo!!,
                             object : CalLessPopView.LessValueListener {
                                 override fun value(count: String?, price: String?) {
+                                    immersionBar {
+                                        hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+                                        init()
+                                    }
                                     if (count.isNullOrEmpty() && price.isNullOrEmpty()) {
                                         currentGoodsInfo?.isLess = 0
                                         mBinding.llEditPrice.visibility = View.VISIBLE
@@ -234,7 +228,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 checkAdapter.setDismissItem(currentGoodsInfo)
                 mBinding.tvReceivePrice.visibility = View.GONE
                 mBinding.llEditPrice.visibility = View.VISIBLE
-                mBinding.editCurrentPrice.setText("")
+                mBinding.editCurrentPrice.text = ""
             }
         }
         val linearLayoutManager = LinearLayoutManager(this)
@@ -257,23 +251,27 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             IntentFilter(ScaleModule.ERROR)
         )
         mBinding.rgUnit.setOnCheckedChangeListener { p0, p1 ->
-            viewModel.currentUnit.set(currentGoodsInfo!!.units[p1])
+            val chosenUnit = currentGoodsInfo!!.units[p1]
+            viewModel.currentUnit.set(chosenUnit)
+            editCurrentDeliveryType(chosenUnit)
         }
     }
 
     private fun initWeight() {
-        Thread {
-            SerialPortUtilForScale.Instance().CloseSerialPort()
-            SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
-            try {
-                ScaleModule.Instance(this@CheckActivity) //初始化称重模块
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-                runOnUiThread {
-                    show(this@CheckActivity, 2000, "初始化称重主板错误！")
+        lifecycleScope.launch {
+            workOnIO {
+                SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
+                try {
+                    ScaleModule.Instance(this@CheckActivity) //初始化称重模块
+                    Log.e("success", "称初始化成功")
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                    runOnUiThread {
+                        show(this@CheckActivity, 2000, "初始化称重主板错误！")
+                    }
                 }
             }
-        }.start()
+        }
     }
 
     private fun calType(type: String): Int {
@@ -321,7 +319,11 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             currentGoodsInfo!!.matchCount = currentGoodsInfo!!.deliver_quantity
             currentGoodsInfo!!.matchPrice = currentGoodsInfo!!.deliver_price
         }
-        if (calType(currentGoodsInfo!!.unit) == 0) {
+        editCurrentDeliveryType(currentGoodsInfo!!.unit)
+    }
+
+    private fun editCurrentDeliveryType(unit: String) {
+        if (calType(unit) == 0) {
             mBinding.tvDeliveryType.text = "计量方式：计重"
             mBinding.tvDeliveryCurrent.visibility = View.VISIBLE
             mBinding.tvDeliveryCurrent.text = mBinding.tvCurrentWeight.text.toString()
@@ -984,14 +986,17 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     inner class ReadDataReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (ScaleModule.ERROR == intent.action) {
-                val error = intent.getStringExtra("error")
-                ToastUtils.show(error)
+                val error = intent.getStringExtra("error") as String
             } else {
                 updateWeight()
             }
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+    }
 
     private fun updateWeight() {
         try {
@@ -1001,6 +1006,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 ).TareWeight,
                 ScaleModule.Instance(this@CheckActivity).SetDotPoint
             )
+            Log.e("currentWeight", currentWeight)
             if (currentDeliveryType == 1) {
                 mBinding.tvDeliveryCurrent.text = formatUnit(currentWeight)
                 mBinding.tvCurrentWeight.text = formatUnit(currentWeight)
@@ -1010,7 +1016,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             }
         } catch (ee: java.lang.Exception) {
             ee.printStackTrace()
-            ToastUtils.show(ee.message!!)
+            Log.e("error12", ee.message!!)
         }
     }
 
@@ -1034,9 +1040,22 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 radioButton.layoutParams = params
             }
             mBinding.rgUnit.addView(radioButton)
-
         }
+    }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        immersionBar {
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+            init()
+        }
+    }
+
+    override fun netStatus(status: Int) {
+        super.netStatus(status)
+        if (status == 0) {
+            show(this@CheckActivity, 2000, "网络已断开连接")
+        }
     }
 
 }

@@ -8,6 +8,7 @@ import com.cangjie.frame.kit.bottom.BaseBottomDialog
 import com.cangjie.frame.kit.keyboard.KeyboardUtil
 import com.cangjie.frame.kit.keyboard.NumberKeyboardView
 import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ktx.destroyImmersionBar
 import com.gyf.immersionbar.ktx.immersionBar
 
 /**
@@ -56,6 +57,11 @@ class EditPriceDialogFragment(title: String, hint: String) : BaseBottomDialog() 
 
     interface ContentCallback {
         fun content(content: String?)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog?.let { destroyImmersionBar(it) }
     }
 
     fun setContentCallback(cb: ContentCallback?): EditPriceDialogFragment {

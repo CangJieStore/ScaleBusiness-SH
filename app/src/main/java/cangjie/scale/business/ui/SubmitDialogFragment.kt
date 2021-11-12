@@ -15,6 +15,7 @@ import cangjie.scale.business.databinding.DialogSubmitBinding
 import cangjie.scale.business.entity.SubmitInfo
 import com.fondesa.recyclerviewdivider.dividerBuilder
 import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ktx.destroyImmersionBar
 import com.gyf.immersionbar.ktx.immersionBar
 import kotlinx.android.synthetic.main.dialog_submit.*
 
@@ -154,6 +155,10 @@ class SubmitDialogFragment : DialogFragment() {
         return this
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        dialog?.let { destroyImmersionBar(it) }
+    }
 
     companion object {
         fun newInstance(args: Bundle?): SubmitDialogFragment? {

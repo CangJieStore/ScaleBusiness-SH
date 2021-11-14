@@ -19,4 +19,5 @@
     <dimen name="dp20">20dp</dimen>
     <dimen name="sp18">18sp</dimen>
     <dimen name="sp21">21sp</dimen>
+    <dimen name="dp3">3dp</dimen>
 </resources>

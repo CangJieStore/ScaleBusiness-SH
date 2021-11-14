@@ -84,7 +84,7 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
         super.initImmersionBar()
         immersionBar {
             fullScreen(true)
-            hideBar(BarHide.FLAG_HIDE_BAR)
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
             keyboardEnable(true)
             statusBarDarkFont(false)
             init()
@@ -118,6 +118,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
             6 -> {
                 EventBus.getDefault()
                     .post(MessageEvent(0, viewModel.chooseDateFiled.get().toString()))
+            }
+            701 -> {
+                startActivity(Intent(this, AdjustActivity::class.java))
+
             }
         }
     }

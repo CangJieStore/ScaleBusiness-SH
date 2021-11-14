@@ -263,7 +263,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
                 try {
                     ScaleModule.Instance(this@CheckActivity) //初始化称重模块
-                    Log.e("success", "称初始化成功")
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                     runOnUiThread {
@@ -290,6 +289,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private fun handlerSelected() {
         viewModel.currentUnit.set(currentGoodsInfo!!.unit)
         addUnit(currentGoodsInfo!!.units)
+        mBinding.tvDeliveryPrice.text = "收货金额：" + currentGoodsInfo!!.receive_amount + "元"
         mBinding.tvDeliveryName.text = "商品名称：" + currentGoodsInfo!!.name
         mBinding.tvReceiveCount.text =
             "采购数量：" + currentGoodsInfo!!.deliver_quantity
@@ -358,7 +358,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     override fun onStart() {
         super.onStart()
-        initWeight()
+//        initWeight()
     }
 
     private fun formatUnit(currentWeight: String): String {
@@ -590,8 +590,10 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(readDataReceiver)
-        SerialPortUtilForScale.Instance().CloseSerialPort()
+        readDataReceiver?.let {
+            unregisterReceiver(it)
+        }
+//        SerialPortUtilForScale.Instance().CloseSerialPort()
         cameraExecutor.shutdown()
         displayManager.unregisterDisplayListener(displayListener)
         sliderAppearingJob?.cancel()
@@ -659,7 +661,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             ScaleModule.Instance(this).ZeroClear()
         } catch (e: Exception) {
             ViewUtils.runOnUiThread {
-                ToastUtils.show("置零失败")
+                ToastUtils.show("置零失败,重新初始化连接...")
             }
         }
     }
@@ -987,15 +989,11 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         override fun onReceive(context: Context, intent: Intent) {
             if (ScaleModule.ERROR == intent.action) {
                 val error = intent.getStringExtra("error") as String
+
             } else {
                 updateWeight()
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
     }
 
     private fun updateWeight() {
@@ -1016,7 +1014,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
             }
         } catch (ee: java.lang.Exception) {
             ee.printStackTrace()
-            Log.e("error12", ee.message!!)
         }
     }
 

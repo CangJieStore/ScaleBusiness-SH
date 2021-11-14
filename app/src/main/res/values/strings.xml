@@ -41,4 +41,18 @@
     <string name="installing">安装中...</string>
     <string name="install">安装</string>
     <string name="apk_file_download_fail">安装文件下载失败</string>
+    <string name="str_adjust_scala">电子称校准</string>
+    <string name="check_title_1">第一步 准备校准</string>
+    <string name="check_content_1">清空秤台并保持秤台静止，操作完成后，点击『下一步』按钮。</string>
+    <string name="check_title_2">第二步 放置标准砝码</string>
+    <string name="check_content_2">请将标准砝码放置在需要进行校准操作的秤台上，操作完成并静止一段时间后，点击『下一步』按钮。</string>
+    <string name="check_title_3">第三步 设定分度值并输入砝码重量</string>
+    <string name="check_content_3">设定分度值并输入砝码重量，操作完成后，点击『下一步』按钮。</string>
+    <string name="check_content_3_indication">电子秤分度值：1</string>
+    <string name="check_content_3_weight">砝码重量(Kg)：</string>
+    <string name="check_weight_hint">请输入放置砝码的重量</string>
+    <string name="check_title_4">第四步 校验完成</string>
+    <string name="check_content_4">校验完成，请点击『完成』按钮退出本向导。</string>
+    <string name="check_next">下一步</string>
+    <string name="check_pre">上一步</string>
 </resources>

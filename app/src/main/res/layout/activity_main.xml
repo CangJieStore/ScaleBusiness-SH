@@ -27,7 +27,6 @@
                 android:layout_width="200dp"
                 android:layout_height="70dp"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/dp30"
                 android:src="@drawable/ic_main_logo" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -101,26 +100,36 @@
                     android:paddingEnd="@dimen/dp20"
                     android:text="@={mainModel.chooseDateFiled}"
                     android:textColor="@color/gray_9"
-                    android:textSize="@dimen/sp20"
+                    android:textSize="@dimen/sp18"
                     binding:onClickCommand="@{mainModel.chooseDate}" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="38dp"
                     android:layout_marginStart="@dimen/dp8"
                     android:background="@drawable/shape_login_btn"
-                    android:drawableStart="@drawable/ic_search"
-                    android:drawablePadding="@dimen/dp15"
                     android:gravity="center_vertical"
                     android:minHeight="40dp"
                     android:paddingStart="@dimen/dp20"
                     android:paddingEnd="@dimen/dp20"
                     android:text="检索"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/sp20"
+                    android:textSize="@dimen/sp18"
                     binding:onClickCommand="@{mainModel.searchCommand}" />
 
-
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:layout_marginStart="@dimen/dp8"
+                    android:background="@drawable/shape_adjust_btn"
+                    android:gravity="center_vertical"
+                    android:minHeight="40dp"
+                    android:paddingStart="@dimen/dp10"
+                    android:paddingEnd="@dimen/dp10"
+                    android:text="电子秤校准"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sp18"
+                    binding:onClickCommand="@{mainModel.adjustCommand}" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -129,10 +138,10 @@
             android:id="@+id/vp_orders"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="@dimen/dp10"
             android:layout_marginTop="@dimen/dp10"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginEnd="@dimen/dp10"
+            android:layout_marginBottom="@dimen/dp10" />
 
 
     </LinearLayout>

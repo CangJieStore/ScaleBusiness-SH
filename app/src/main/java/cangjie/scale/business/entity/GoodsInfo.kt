@@ -27,5 +27,6 @@ data class GoodsInfo(
     var isLess: Int = 0,
     var matchCount: String?,
     var matchPrice: String?,
-    var costPrice: String?
+    var costPrice: String?,
+    val receive_amount: String
 ) : Serializable

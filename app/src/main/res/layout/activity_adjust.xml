@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="adjustModel"
+            type="cangjie.scale.business.vm.AdjustViewModel" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/activity_check"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/shape_main_bg"
+            android:padding="@dimen/dp10">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:drawableStart="@drawable/ic_back"
+                android:drawablePadding="@dimen/dp8"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/dp25"
+                android:paddingEnd="@dimen/dp25"
+                android:text="@string/str_adjust_scala"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp20"
+                app:onClickCommand="@{adjustModel.finishCommand}" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.7"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/dp5"
+                    android:text="重量(Kg)："
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/sp20" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_current_weight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="@dimen/dp10"
+                    android:text="0.00"
+                    android:textColor="@color/text_color"
+                    android:textSize="70sp" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/step_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="清空台秤"
+                        android:textColor="@color/theme_color"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/step_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="放置标准砝码"
+                        android:textColor="@color/text_color"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/step_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="选择砝码重量"
+                        android:textColor="@color/text_color"
+                        android:textSize="28sp" />
+
+                    <TextView
+                        android:id="@+id/step_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="完成"
+                        android:textColor="@color/text_color"
+                        android:textSize="28sp" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/text_color" />
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.3">
+
+                <TextView
+                    android:id="@+id/check_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="30dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:text="@string/check_title_1"
+                    android:textColor="@color/black"
+                    android:textSize="38sp" />
+
+                <TextView
+                    android:id="@+id/check_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/check_title"
+                    android:padding="15dp"
+                    android:text="@string/check_content_1"
+                    android:textColor="@color/text_color"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/check_indication"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/check_content"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:text="@string/check_content_3_indication"
+                    android:textColor="@color/black"
+                    android:textSize="28sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/check_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/check_indication"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="15dp"
+                    android:paddingRight="15dp"
+                    android:text="@string/check_content_3_weight"
+                    android:textColor="@color/black"
+                    android:textSize="28sp"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:id="@+id/check_weight_num"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/check_weight"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:hint="@string/check_weight_hint"
+                    android:inputType="number"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/tip_text_color"
+                    android:textSize="28sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/check_next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/bg_button"
+                    android:paddingLeft="50dp"
+                    android:paddingTop="20dp"
+                    android:paddingRight="50dp"
+                    android:paddingBottom="20dp"
+                    android:text="@string/check_next"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/sp20" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

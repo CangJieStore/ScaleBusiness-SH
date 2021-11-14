@@ -2,13 +2,14 @@ package cangjie.scale.business.scale;
 
 import android.util.Log;
 
+import com.cangjie.frame.kit.lib.ToastUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import android_serialport_api.SerialPort;
-
 
 
 public class SerialPortUtilForScale {
@@ -20,7 +21,8 @@ public class SerialPortUtilForScale {
     private String prot = "ttyS1";//1
     private int baudrate = 9600;
 
-    private SerialPortUtilForScale() {}
+    private SerialPortUtilForScale() {
+    }
 
     public void OpenSerialPort() {
         try {
@@ -28,11 +30,11 @@ public class SerialPortUtilForScale {
                     0);
             mInputStream = mSerialPort.getInputStream();
             mOutputStream = mSerialPort.getOutputStream();
-
             isOpen = true;
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            ToastUtils.show("称重设备串口打开失败");
             Log.i("test", "打开失败");
             e.printStackTrace();
         }
@@ -40,11 +42,10 @@ public class SerialPortUtilForScale {
 
     private static SerialPortUtilForScale singleTon = null;
 
-    public static SerialPortUtilForScale Instance()
-    {
-        if(null == singleTon)
+    public static SerialPortUtilForScale Instance() {
+        if (null == singleTon)
             singleTon = new SerialPortUtilForScale();
-        return  singleTon;
+        return singleTon;
     }
 
     /**

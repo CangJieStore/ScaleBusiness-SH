@@ -66,6 +66,11 @@ class ScaleViewModel : BaseScaleViewModel() {
             action(MsgEvent(2))
         }
     })
+    var adjustCommand: BindingCommand<Any> = BindingCommand(object : BindingAction {
+        override fun call() {
+            action(MsgEvent(701))
+        }
+    })
     var detailClose: BindingCommand<Any> = BindingCommand(object : BindingAction {
         override fun call() {
             action(MsgEvent(3))

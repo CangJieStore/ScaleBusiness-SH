@@ -3,6 +3,9 @@ package cangjie.scale.business.base
 import android.app.Application
 import cangjie.scale.business.R
 import cangjie.scale.business.base.http.HttpManager
+import cangjie.scale.business.scale.ScaleModule
+import cangjie.scale.business.scale.SerialPortUtilForScale
+import com.blankj.utilcode.util.ViewUtils
 import com.cangjie.frame.core.db.CangJie
 import com.cangjie.frame.kit.OkHttp3Connection
 import com.cangjie.frame.kit.lib.ToastUtils
@@ -33,6 +36,15 @@ class ScaleApplication : Application() {
         ToastUtils.init(this,
             BlackToastStyle()
         )
+        SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
+        try {
+            ScaleModule.Instance(this) //初始化称重模块
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            ViewUtils.runOnUiThread {
+                ToastUtils.show("初始化称重主板错误！")
+            }
+        }
         HttpManager.init(this)
         update()
     }

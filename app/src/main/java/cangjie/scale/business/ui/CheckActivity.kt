@@ -260,7 +260,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private fun initWeight() {
         lifecycleScope.launch {
             workOnIO {
-                SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
                 try {
                     ScaleModule.Instance(this@CheckActivity) //初始化称重模块
                 } catch (e: java.lang.Exception) {
@@ -358,7 +357,7 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     override fun onStart() {
         super.onStart()
-//        initWeight()
+        initWeight()
     }
 
     private fun formatUnit(currentWeight: String): String {
@@ -593,7 +592,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         readDataReceiver?.let {
             unregisterReceiver(it)
         }
-//        SerialPortUtilForScale.Instance().CloseSerialPort()
         cameraExecutor.shutdown()
         displayManager.unregisterDisplayListener(displayListener)
         sliderAppearingJob?.cancel()

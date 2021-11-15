@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.ActivityLoginBinding
+import cangjie.scale.business.scale.SerialPortUtilForScale
 import cangjie.scale.business.vm.ScaleViewModel
 import com.cangjie.frame.core.BaseMvvmActivity
 import com.cangjie.frame.core.event.MsgEvent
@@ -12,6 +13,7 @@ import com.cangjie.frame.kit.show
 import com.gyf.immersionbar.BarHide
 
 import com.gyf.immersionbar.ktx.immersionBar
+import kotlin.system.exitProcess
 
 /**
  * @author: guruohan
@@ -21,7 +23,8 @@ class LoginActivity : BaseMvvmActivity<ActivityLoginBinding, ScaleViewModel>() {
 
     override fun initActivity(savedInstanceState: Bundle?) {
         mBinding.tvExit.setOnClickListener {
-            finish()
+            SerialPortUtilForScale.Instance().CloseSerialPort()
+            exitProcess(0)
         }
     }
 
@@ -52,6 +55,12 @@ class LoginActivity : BaseMvvmActivity<ActivityLoginBinding, ScaleViewModel>() {
             startActivity(Intent(this, MainActivity::class.java))
             this@LoginActivity.finish()
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        SerialPortUtilForScale.Instance().CloseSerialPort()
+        exitProcess(0)
     }
 
 }

@@ -48,6 +48,16 @@ public class AppUtils {
         }
     }
 
+    public static boolean checkRooted() {
+        boolean result = false;
+        try {
+            result = new File("/system/bin/su").exists() || new File("/system/xbin/su").exists();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
      */

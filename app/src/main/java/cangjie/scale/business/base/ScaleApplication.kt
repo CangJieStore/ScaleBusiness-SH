@@ -14,6 +14,7 @@ import com.cangjie.frame.kit.update.model.TypeConfig
 import com.cangjie.frame.kit.update.model.UpdateConfig
 import com.cangjie.frame.kit.update.utils.AppUpdateUtils
 import com.cangjie.frame.kit.update.utils.SSLUtils
+import com.umeng.commonsdk.UMConfigure
 
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
@@ -28,6 +29,16 @@ class ScaleApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         setApplication(this)
+        UMConfigure.setLogEnabled(true);
+        //友盟预初始化
+        UMConfigure.preInit(this, "61951280e014255fcb7eff13", "ScalaBusiness")
+        UMConfigure.init(
+            this,
+            "61951280e014255fcb7eff13",
+            "ScalaBusiness",
+            UMConfigure.DEVICE_TYPE_PHONE,
+            ""
+        )
         CangJie.init(this)
         CangJie.config {
             multiProcess = true

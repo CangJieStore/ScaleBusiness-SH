@@ -55,4 +55,6 @@
     <string name="check_content_4">校验完成，请点击『完成』按钮退出本向导。</string>
     <string name="check_next">下一步</string>
     <string name="check_pre">上一步</string>
+    <string name="accessibility_service_description">应用自动安装服务</string>
+
 </resources>

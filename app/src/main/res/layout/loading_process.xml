@@ -23,7 +23,7 @@
         android:paddingRight="12dp"
         android:paddingBottom="12dp">
 
-        <cn.cangjie.core.loading.LoadingIndicator
+        <com.cangjie.frame.core.loading.LoadingIndicator
             android:id="@+id/progress_wheel"
             android:layout_width="45dp"
             android:layout_height="45dp"

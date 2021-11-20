@@ -67,7 +67,7 @@ class SubmitDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         data = arguments?.get("info") as MutableList<SubmitInfo>
         submitBinding!!.ivClose.setOnClickListener {
-            dismiss()
+            dismissAllowingStateLoss()
         }
         submitBinding!!.rbType1.setOnClickListener {
             rb_type1.isChecked = true

@@ -75,7 +75,8 @@
             android:theme="@style/DialogActivityTheme" />
         <activity
             android:name=".ui.CheckActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
         <activity
             android:name=".ui.CheckedDetailActivity"
             android:screenOrientation="landscape" />

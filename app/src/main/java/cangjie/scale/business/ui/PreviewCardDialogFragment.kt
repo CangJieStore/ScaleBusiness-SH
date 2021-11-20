@@ -61,7 +61,7 @@ class PreviewCardDialogFragment : DialogFragment() {
         path = arguments?.get("info") as String?
         previewCardBinding!!.path = path
         previewCardBinding!!.ivClose.setOnClickListener {
-            dismiss()
+            dismissAllowingStateLoss()
         }
     }
 

@@ -9,7 +9,9 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import cangjie.scale.business.R
 import cangjie.scale.business.databinding.FragmentChooseDateBinding
+import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.destroyImmersionBar
+import com.gyf.immersionbar.ktx.immersionBar
 
 
 /**
@@ -51,6 +53,10 @@ class DateDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        immersionBar {
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+            init()
+        }
         dataBinding?.let {
             it.monthCalendar.setOnCalendarChangedListener { _, year, month, localDate, _ ->
                 dataBinding!!.tvCurrentDate.text = year.toString() + "年" + month.toString() + "月"
@@ -59,7 +65,7 @@ class DateDialogFragment : DialogFragment() {
             it.actionCancel.setOnClickListener { dismiss() }
             it.actionDone.setOnClickListener {
                 action?.submit(currentDate!!)
-                dismiss()
+                dismissAllowingStateLoss()
             }
         }
 

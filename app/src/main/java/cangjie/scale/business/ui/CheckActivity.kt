@@ -1,6 +1,5 @@
 package cangjie.scale.business.ui
 
-import android.Manifest
 import android.content.*
 import android.content.res.Configuration
 import android.graphics.*
@@ -16,7 +15,6 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -25,7 +23,6 @@ import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
-import androidx.core.view.marginStart
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import cangjie.scale.business.R
@@ -40,30 +37,18 @@ import cangjie.scale.business.entity.OrderInfo
 import cangjie.scale.business.entity.SubmitInfo
 import cangjie.scale.business.scale.FormatUtil
 import cangjie.scale.business.scale.ScaleModule
-import cangjie.scale.business.scale.SerialPortUtilForScale
 import cangjie.scale.business.vm.ScaleViewModel
-import cangjie.scale.business.widget.CalLessPopView
 import com.blankj.utilcode.util.ViewUtils
 import com.cangjie.frame.core.BaseMvvmActivity
-import com.cangjie.frame.core.clearText
 import com.cangjie.frame.core.event.MsgEvent
-import com.cangjie.frame.core.net.annotation.NetType
 import com.cangjie.frame.kit.LuminosityAnalyzer
 import com.cangjie.frame.kit.RotationListener
 import com.cangjie.frame.kit.lib.ToastUtils
 import com.cangjie.frame.kit.show
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.listener.OnItemChildClickListener
 import com.fondesa.recyclerviewdivider.dividerBuilder
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ktx.immersionBar
-import com.lxj.xpopup.XPopup
-import com.lxj.xpopup.core.AttachPopupView
-import com.lxj.xpopup.enums.PopupPosition
-import com.lxj.xpopup.interfaces.OnSelectListener
-import com.permissionx.guolindev.PermissionX
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
@@ -188,38 +173,26 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         }
         checkAdapter.setOnItemChildClickListener { adapter, view, position ->
             if (currentGoodsInfo!!.isLess == 0) {
-                val popupView = XPopup.Builder(this@CheckActivity)
-                    .autoOpenSoftInput(true)
-                    .popupPosition(PopupPosition.Right)
-                    .dismissOnTouchOutside(false)
-                    .hasStatusBarShadow(false)
-                    .asCustom(
-                        CalLessPopView(
-                            this@CheckActivity,
-                            currentGoodsInfo!!,
-                            object : CalLessPopView.LessValueListener {
-                                override fun value(count: String?, price: String?) {
-                                    immersionBar {
-                                        hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
-                                        init()
-                                    }
-                                    if (count.isNullOrEmpty() && price.isNullOrEmpty()) {
-                                        currentGoodsInfo?.isLess = 0
-                                        mBinding.llEditPrice.visibility = View.VISIBLE
-                                        mBinding.tvReceivePrice.visibility = View.GONE
-                                    } else {
-                                        mBinding.llEditPrice.visibility = View.GONE
-                                        mBinding.tvReceivePrice.visibility = View.VISIBLE
-                                        checkAdapter.setDismissItem(currentGoodsInfo!!)
-                                        currentGoodsInfo?.isLess = 1
-                                        currentGoodsInfo?.matchCount = count!!
-                                        currentGoodsInfo?.matchPrice = price!!
-                                    }
-                                    calCostPrice()
-                                }
-                            })
-                    )
-                popupView.show()
+                val bundle = Bundle()
+                bundle.putSerializable("info", currentGoodsInfo!!)
+                EditShellDialogFragment.newInstance(bundle)
+                    .setValueListener(object : EditShellDialogFragment.LessValueListener {
+                        override fun value(count: String?, price: String?) {
+                            if (count.isNullOrEmpty() && price.isNullOrEmpty()) {
+                                currentGoodsInfo?.isLess = 0
+                                mBinding.llEditPrice.visibility = View.VISIBLE
+                                mBinding.tvReceivePrice.visibility = View.GONE
+                            } else {
+                                mBinding.llEditPrice.visibility = View.GONE
+                                mBinding.tvReceivePrice.visibility = View.VISIBLE
+                                checkAdapter.setDismissItem(currentGoodsInfo!!)
+                                currentGoodsInfo?.isLess = 1
+                                currentGoodsInfo?.matchCount = count!!
+                                currentGoodsInfo?.matchPrice = price!!
+                            }
+                            calCostPrice()
+                        }
+                    }).show(supportFragmentManager, "preview")
             } else {
                 currentGoodsInfo!!.isLess = 0
                 currentGoodsInfo!!.matchPrice = null
@@ -534,13 +507,13 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     }
 
     private fun showShell() {
-        EditShellDialogFragment.newInstance(null)!!
-            .setAction(object : EditShellDialogFragment.SubmitAction {
-                override fun submit(shell: String) {
-                    currentShell = shell.toFloat()
-                    updateWeight()
-                }
-            }).show(supportFragmentManager, "shell")
+        EditPriceDialogFragment("手动去皮", "请输入皮重...").setContentCallback(object :
+            EditPriceDialogFragment.ContentCallback {
+            override fun content(content: String?) {
+                currentShell = if (content.isNullOrEmpty()) 0f else content.toFloat()
+                updateWeight()
+            }
+        }).show(supportFragmentManager)
     }
 
     override fun toast(notice: String?) {
@@ -987,7 +960,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         override fun onReceive(context: Context, intent: Intent) {
             if (ScaleModule.ERROR == intent.action) {
                 val error = intent.getStringExtra("error") as String
-
             } else {
                 updateWeight()
             }

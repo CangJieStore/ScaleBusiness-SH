@@ -56,6 +56,19 @@
         <item name="android:windowExitAnimation">@anim/preview_window_out</item>
     </style>
 
+    <style name="LossDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@style/LossDialog.AnimationStyle</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+    <style name="LossDialog.AnimationStyle" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/right_in_window</item>
+        <item name="android:windowExitAnimation">@anim/right_out_window</item>
+    </style>
+
     <!-- 对话框默认样式 -->
     <style name="BaseDialogStyle" parent="Theme.AppCompat.DayNight.Dialog.Alert"><!-- @android:style/Theme.Dialog -->
         <!-- 无边框 -->

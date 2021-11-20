@@ -131,6 +131,13 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
         EventBus.getDefault().post(MessageEvent(0, viewModel.chooseDateFiled.get().toString()))
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        immersionBar {
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
+            init()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()

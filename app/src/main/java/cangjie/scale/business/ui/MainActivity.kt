@@ -2,6 +2,7 @@ package cangjie.scale.business.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import cangjie.scale.business.R
@@ -9,9 +10,12 @@ import cangjie.scale.business.base.BaseFragmentPagerAdapter
 import cangjie.scale.business.base.DateUtil
 import cangjie.scale.business.base.workOnIO
 import cangjie.scale.business.databinding.ActivityMainBinding
+import cangjie.scale.business.db.SubmitOrder
 import cangjie.scale.business.entity.MessageEvent
 import cangjie.scale.business.entity.Update
+import cangjie.scale.business.entity.UploadTask
 import cangjie.scale.business.service.InitService
+import cangjie.scale.business.service.MultiTaskUploader
 import cangjie.scale.business.vm.ScaleViewModel
 import com.cangjie.frame.core.BaseMvvmActivity
 import com.cangjie.frame.core.NetUtils
@@ -25,6 +29,7 @@ import com.gyf.immersionbar.ktx.immersionBar
 import kotlinx.coroutines.launch
 
 import org.greenrobot.eventbus.EventBus
+import java.io.File
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,11 +52,15 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
     }
 
     override fun initActivity(savedInstanceState: Bundle?) {
-        viewModel.loadUpdate()
         mBinding.vpOrders.adapter = mAdapter
         mBinding.tabOrders.setViewPager(mBinding.vpOrders)
         mBinding.tabOrders.currentTab = 0
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val date = Date(System.currentTimeMillis())
+        viewModel.chooseDateFiled.set(simpleDateFormat.format(date))
         netTime()
+        viewModel.getUpload()
+        viewModel.loadUpdate()
     }
 
     private fun netTime() {
@@ -66,9 +75,6 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
                     viewModel.chooseDateFiled.set(now)
                     EventBus.getDefault().post(MessageEvent(0, now))
                 } catch (e: Exception) {
-                    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
-                    val date = Date(System.currentTimeMillis())
-                    viewModel.chooseDateFiled.set(simpleDateFormat.format(date))
                     EventBus.getDefault()
                         .post(MessageEvent(0, viewModel.chooseDateFiled.get().toString()))
                 }
@@ -174,6 +180,42 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
         model.getUpdate().observe(this, {
             it?.let {
                 update(it)
+            }
+        })
+        model.allUploadOrders.observe(this, {
+            if (it.size > 0) {
+                val data = arrayListOf<UploadTask>()
+                it.forEach { item ->
+                    run {
+                        val task = UploadTask(
+                            item.id,
+                            item.goodsId,
+                            item.batchId,
+                            item.batchPath,
+                            item.isUpload,
+                            0,
+                            null, MultiTaskUploader.IDLE
+                        )
+                        data.add(task)
+                    }
+                }
+                val bundle = Bundle()
+                bundle.putSerializable("orders", data)
+                UploadDialogFragment.newInstance(bundle)
+                    .setStandByCallback(object : UploadDialogFragment.StandByCallback {
+                        override fun upload(item: UploadTask) {
+                            val submitOrder =
+                                SubmitOrder(item.id, item.goodsId, item.batchId, item.batchPath, 2)
+                            val file = File(item.batchPath)
+                            contentResolver.delete(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                MediaStore.Images.Media.DATA + "=?",
+                                arrayOf(item.batchPath)
+                            )
+                            file.delete()
+                            viewModel.update(submitOrder)
+                        }
+                    }).show(supportFragmentManager, "")
             }
         })
     }

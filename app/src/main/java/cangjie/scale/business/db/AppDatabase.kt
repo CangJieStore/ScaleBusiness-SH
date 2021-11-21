@@ -14,7 +14,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun orderDao(): SubmitOrderDao
 
     companion object {
-        private const val DATABASE_NAME = "submit_order"
+        private const val DATABASE_NAME = "scala_business"
 
         @Volatile
         private var INSTANCE: AppDatabase? = null

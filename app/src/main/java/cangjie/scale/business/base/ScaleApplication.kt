@@ -15,6 +15,7 @@ import com.cangjie.frame.kit.update.model.UpdateConfig
 import com.cangjie.frame.kit.update.utils.AppUpdateUtils
 import com.cangjie.frame.kit.update.utils.SSLUtils
 import com.umeng.commonsdk.UMConfigure
+import kotlinx.coroutines.GlobalScope
 
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
@@ -29,6 +30,16 @@ class ScaleApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         setApplication(this)
+        ToastUtils.init(this, BlackToastStyle())
+        SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
+//        try {
+//            ScaleModule.Instance(this) //初始化称重模块
+//        } catch (e: java.lang.Exception) {
+//            e.printStackTrace()
+//            ViewUtils.runOnUiThread {
+//                ToastUtils.show("初始化称重主板错误！")
+//            }
+//        }
         UMConfigure.setLogEnabled(true);
         //友盟预初始化
         UMConfigure.preInit(this, "61951280e014255fcb7eff13", "ScalaBusiness")
@@ -44,18 +55,6 @@ class ScaleApplication : Application() {
             multiProcess = true
             encryptKey = "encryptKey"
         }
-        ToastUtils.init(this,
-            BlackToastStyle()
-        )
-        SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
-        try {
-            ScaleModule.Instance(this) //初始化称重模块
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-            ViewUtils.runOnUiThread {
-                ToastUtils.show("初始化称重主板错误！")
-            }
-        }
         HttpManager.init(this)
         update()
     }
@@ -69,7 +68,7 @@ class ScaleApplication : Application() {
                 SSLUtils.getSslSocketFactory().sSLSocketFactory,
                 SSLUtils.getSslSocketFactory().trustManager
             )
-            .hostnameVerifier(HostnameVerifier { _, _ -> true })
+            .hostnameVerifier { _, _ -> true }
             .retryOnConnectionFailure(true)
 
         val updateConfig: UpdateConfig = UpdateConfig()

@@ -3,34 +3,17 @@ package cangjie.scale.business.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.provider.MediaStore
-import android.util.Log
-import cangjie.scale.business.base.ScaleApplication
-import cangjie.scale.business.base.http.Url
-import cangjie.scale.business.db.AppDatabase
-import cangjie.scale.business.db.SubmitOrder
-import cangjie.scale.business.db.SubmitOrderDao
 import cangjie.scale.business.entity.MessageEvent
 import cangjie.scale.business.scale.ScaleModule
 import cangjie.scale.business.scale.SerialPortUtilForScale
 import com.blankj.utilcode.util.ViewUtils.runOnUiThread
 import com.cangjie.frame.core.db.CangJie
 import com.cangjie.frame.kit.lib.ToastUtils
-import com.google.gson.Gson
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.core.SingleObserver
-import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import rxhttp.RxHttp
-import rxhttp.awaitResult
-import rxhttp.toStr
-import java.io.File
-import java.util.*
-import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
 /**
@@ -38,10 +21,6 @@ import kotlin.system.exitProcess
  * @date 2021/9/10 10:53
  */
 class InitService : Service(), CoroutineScope by MainScope() {
-
-    lateinit var timer: Timer
-    private val corLife = CoroutineCycle()
-    private var booksDao: SubmitOrderDao? = null
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -51,28 +30,6 @@ class InitService : Service(), CoroutineScope by MainScope() {
         super.onCreate()
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
-        }
-        timer = fixedRateTimer("", false, 0, 60000) {
-            val single: Single<MutableList<SubmitOrder>> = Single.create { emitter ->
-                booksDao = AppDatabase.get(ScaleApplication.instance!!).orderDao()
-                val orders = booksDao!!.getUpload()
-                emitter.onSuccess(orders)
-            }
-            single.subscribe(object : SingleObserver<MutableList<SubmitOrder>> {
-                override fun onSuccess(o: MutableList<SubmitOrder>) {
-                    Log.e("orders", Gson().toJson(o))
-                    for (item in o) {
-                        upload(item)
-                    }
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onError(e: Throwable) {
-                }
-            })
         }
     }
 
@@ -93,36 +50,11 @@ class InitService : Service(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun upload(order: SubmitOrder) {
-        corLife.launch({
-            RxHttp.postForm(Url.upload)
-                .add("access_token", CangJie.getString("token"))
-                .add("id", order.goodsId)
-                .add("batch", order.batchId)
-                .addFile("file", File(order.batchPath))
-                .toStr()
-                .awaitResult()
-            val file = File(order.batchPath)
-            contentResolver.delete(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.DATA + "=?",
-                arrayOf(order.batchPath)
-            )
-            file.delete()
-            order.isUpload = 2
-            booksDao!!.update(order)
-        }, {
-
-        })
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this)
         }
-        corLife.close()
-        timer.cancel()
         if (CangJie.getString("token", "").isNotEmpty()) {
             SerialPortUtilForScale.Instance().CloseSerialPort()
             exitProcess(0)

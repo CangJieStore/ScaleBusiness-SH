@@ -35,8 +35,10 @@ import cangjie.scale.business.db.SubmitOrder
 import cangjie.scale.business.entity.GoodsInfo
 import cangjie.scale.business.entity.OrderInfo
 import cangjie.scale.business.entity.SubmitInfo
+import cangjie.scale.business.entity.UploadTask
 import cangjie.scale.business.scale.FormatUtil
 import cangjie.scale.business.scale.ScaleModule
+import cangjie.scale.business.service.MultiTaskUploader
 import cangjie.scale.business.vm.ScaleViewModel
 import com.blankj.utilcode.util.ViewUtils
 import com.cangjie.frame.core.BaseMvvmActivity
@@ -259,39 +261,39 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     }
 
     private fun handlerSelected() {
-        viewModel.currentUnit.set(currentGoodsInfo!!.unit)
-        addUnit(currentGoodsInfo!!.units)
-        mBinding.tvDeliveryPrice.text = "收货金额：" + currentGoodsInfo!!.receive_amount + "元"
-        mBinding.tvDeliveryName.text = "商品名称：" + currentGoodsInfo!!.name
-        mBinding.tvReceiveCount.text =
-            "采购数量：" + currentGoodsInfo!!.deliver_quantity
-        mBinding.tvDeliveryCount.text =
-            "已验数量：" + currentGoodsInfo!!.receive_quantity
-        if (currentGoodsInfo!!.receive_loss.isNotEmpty()) {
-            currentGoodsInfo!!.isLess = currentGoodsInfo!!.receive_loss.toInt()
-        }
-        if (currentGoodsInfo!!.receive_price.isNotEmpty()) {
-            if (currentGoodsInfo!!.receive_price.toFloat() > 0) {
-                if (currentGoodsInfo!!.receive_loss == "1") {
-                    mBinding.tvReceivePrice.visibility = View.VISIBLE
-                    mBinding.llEditPrice.visibility = View.GONE
-                    mBinding.tvReceivePrice.text = (currentGoodsInfo!!.receive_price)
+        currentGoodsInfo?.let {
+            viewModel.currentUnit.set(it.unit)
+            addUnit(it.units)
+            mBinding.tvDeliveryPrice.text = "收货金额：" + it.receive_amount + " 元"
+            mBinding.tvDeliveryName.text = "商品名称：" + it.name
+            mBinding.tvReceiveCount.text = "采购数量：" + it.deliver_quantity
+            mBinding.tvDeliveryCount.text = "已验数量：" + it.receive_quantity
+            if (it.receive_loss.isNotEmpty()) {
+                it.isLess = it.receive_loss.toInt()
+            }
+            if (it.receive_price.isNotEmpty()) {
+                if (it.receive_price.toFloat() > 0) {
+                    if (it.receive_loss == "1") {
+                        mBinding.tvReceivePrice.visibility = View.VISIBLE
+                        mBinding.llEditPrice.visibility = View.GONE
+                        mBinding.tvReceivePrice.text = (it.receive_price)
+                    } else {
+                        mBinding.tvReceivePrice.visibility = View.GONE
+                        mBinding.llEditPrice.visibility = View.VISIBLE
+                        mBinding.editCurrentPrice.text = it.receive_price
+                    }
                 } else {
                     mBinding.tvReceivePrice.visibility = View.GONE
                     mBinding.llEditPrice.visibility = View.VISIBLE
-                    mBinding.editCurrentPrice.text = currentGoodsInfo!!.receive_price
+                    mBinding.editCurrentPrice.text = it.receive_price
                 }
-            } else {
-                mBinding.tvReceivePrice.visibility = View.GONE
-                mBinding.llEditPrice.visibility = View.VISIBLE
-                mBinding.editCurrentPrice.text = currentGoodsInfo!!.receive_price
             }
+            if (it.repair_receive == "1" && it.receive_loss == "1") {
+                it.matchCount = it.deliver_quantity
+                it.matchPrice = it.deliver_price
+            }
+            editCurrentDeliveryType(it.unit)
         }
-        if (currentGoodsInfo!!.repair_receive == "1" && currentGoodsInfo!!.receive_loss == "1") {
-            currentGoodsInfo!!.matchCount = currentGoodsInfo!!.deliver_quantity
-            currentGoodsInfo!!.matchPrice = currentGoodsInfo!!.deliver_price
-        }
-        editCurrentDeliveryType(currentGoodsInfo!!.unit)
     }
 
     private fun editCurrentDeliveryType(unit: String) {
@@ -319,7 +321,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
     override fun layoutId(): Int = R.layout.activity_check
     override fun initImmersionBar() {
-        super.initImmersionBar()
         immersionBar {
             fullScreen(true)
             hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
@@ -364,27 +365,29 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 finish()
             }
             4 -> {//restart delivery
-                for (path in imgData) {
-                    val file = File(path)
-                    contentResolver.delete(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        MediaStore.Images.Media.DATA + "=?",
-                        arrayOf(path)
-                    )
-                    file.delete()
+                currentGoodsInfo?.let {
+                    for (path in imgData) {
+                        val file = File(path)
+                        contentResolver.delete(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            MediaStore.Images.Media.DATA + "=?",
+                            arrayOf(path)
+                        )
+                        file.delete()
+                    }
+                    currentRepairGood = it
+                    viewModel.clear(it.id)
+                    mBinding.tvDeliveryCount.text =
+                        "已验数量：" + FormatUtil.roundByScale(
+                            it.receive_quantity.toDouble(),
+                            2
+                        )
+                    mBinding.editCurrentCount.text = ""
+                    submitList.clear()
+                    imgData.clear()
+                    imgAdapter.data.clear()
+                    imgAdapter.notifyDataSetChanged()
                 }
-                currentRepairGood = currentGoodsInfo
-                viewModel.clear(currentGoodsInfo!!.id)
-                mBinding.tvDeliveryCount.text =
-                    "已验数量：" + FormatUtil.roundByScale(
-                        currentGoodsInfo!!.receive_quantity.toDouble(),
-                        2
-                    )
-                mBinding.editCurrentCount.setText("")
-                submitList.clear()
-                imgData.clear()
-                imgAdapter.data.clear()
-                imgAdapter.notifyDataSetChanged()
             }
             5 -> {//submit delivery
                 currentRepairGood = null
@@ -451,16 +454,18 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
 
             }
             7 -> {//take photo
-                if (currentDeliveryType == 2) {
-                    if (TextUtils.isEmpty(mBinding.editCurrentCount.text.toString())) {
-                        if (mBinding.editCurrentCount.text.toString().isEmpty()) {
-                            show(this@CheckActivity, 2000, "请输入验收数量")
-                            return
+                currentGoodsInfo?.let {
+                    if (currentDeliveryType == 2) {
+                        if (TextUtils.isEmpty(mBinding.editCurrentCount.text.toString())) {
+                            if (mBinding.editCurrentCount.text.toString().isEmpty()) {
+                                show(this@CheckActivity, 2000, "请输入验收数量")
+                                return
+                            }
                         }
                     }
+                    val currentNum = deliveryCount()
+                    takePhoto(currentNum)
                 }
-                val currentNum = deliveryCount()
-                takePhoto(currentNum)
             }
             200 -> {//submit response
                 for (item in submitList) {
@@ -640,7 +645,6 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
     private fun takePhoto(currentWeight: String) {
         loading("处理中...")
         imageCapture?.let { imageCapture ->
-
             val photoFile = createFile(
                 outputDirectory,
                 getString(R.string.output_photo_date_template),
@@ -941,9 +945,49 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                             currentGoodsInfo = checkAdapter.data[0]
                             handlerSelected()
                             checkPosition(currentGoodsInfo!!)
+                        } else {
+                            currentGoodsInfo = null
+                            resetCheck()
+                            viewModel.getUpload()
                         }
                     }
                 }
+            }
+        })
+        model.allUploadOrders.observe(this, {
+            if (it.size > 0) {
+                val data = arrayListOf<UploadTask>()
+                it.forEach { item ->
+                    run {
+                        val task = UploadTask(
+                            item.id,
+                            item.goodsId,
+                            item.batchId,
+                            item.batchPath,
+                            item.isUpload,
+                            0,
+                            null, MultiTaskUploader.IDLE
+                        )
+                        data.add(task)
+                    }
+                }
+                val bundle = Bundle()
+                bundle.putSerializable("orders", data)
+                UploadDialogFragment.newInstance(bundle)
+                    .setStandByCallback(object : UploadDialogFragment.StandByCallback {
+                        override fun upload(item: UploadTask) {
+                            val submitOrder =
+                                SubmitOrder(item.id, item.goodsId, item.batchId, item.batchPath, 2)
+                            val file = File(item.batchPath)
+                            contentResolver.delete(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                MediaStore.Images.Media.DATA + "=?",
+                                arrayOf(item.batchPath)
+                            )
+                            file.delete()
+                            viewModel.update(submitOrder)
+                        }
+                    }).show(supportFragmentManager, "")
             }
         })
     }
@@ -966,6 +1010,20 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
         }
     }
 
+    private fun resetCheck() {
+        mBinding.tvCurrentWeight.text = "0.00"
+        mBinding.tvDeliveryCurrent.text = "0.00"
+        mBinding.tvDeliveryName.text = "商品名称：****"
+        mBinding.tvDeliveryCount.text = "配送数量：0.00"
+        mBinding.tvReceiveCount.text = "已验数量：0.00"
+        mBinding.tvDeliveryPrice.text = "收货金额: 0.00 元"
+        mBinding.tvReceivePrice.text = "0.00"
+        mBinding.editCurrentPrice.text = ""
+        mBinding.tvDeliveryCurrent.visibility = View.VISIBLE
+        mBinding.llEditCount.visibility = View.GONE
+        mBinding.btnRemove.visibility = View.GONE
+    }
+
     private fun updateWeight() {
         try {
             val currentWeight = FormatUtil.roundByScale(
@@ -974,14 +1032,16 @@ class CheckActivity : BaseMvvmActivity<ActivityCheckBinding, ScaleViewModel>() {
                 ).TareWeight,
                 ScaleModule.Instance(this@CheckActivity).SetDotPoint
             )
-            Log.e("currentWeight", currentWeight)
-            if (currentDeliveryType == 1) {
-                mBinding.tvDeliveryCurrent.text = formatUnit(currentWeight)
-                mBinding.tvCurrentWeight.text = formatUnit(currentWeight)
-            } else {
-                mBinding.tvCurrentWeight.text = "0.00"
-                mBinding.tvDeliveryCurrent.text = "0.00"
+            currentGoodsInfo?.let {
+                if (currentDeliveryType == 1) {
+                    mBinding.tvDeliveryCurrent.text = formatUnit(currentWeight)
+                    mBinding.tvCurrentWeight.text = formatUnit(currentWeight)
+                } else {
+                    mBinding.tvCurrentWeight.text = "0.00"
+                    mBinding.tvDeliveryCurrent.text = "0.00"
+                }
             }
+            currentGoodsInfo ?: resetCheck()
         } catch (ee: java.lang.Exception) {
             ee.printStackTrace()
         }

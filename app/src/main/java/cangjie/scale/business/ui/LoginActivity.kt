@@ -34,8 +34,7 @@ class LoginActivity : BaseMvvmActivity<ActivityLoginBinding, ScaleViewModel>() {
     override fun initImmersionBar() {
         immersionBar {
             fullScreen(true)
-            hideBar(BarHide.FLAG_HIDE_BAR)
-            keyboardEnable(true)
+            hideBar(BarHide.FLAG_HIDE_NAVIGATION_BAR)
             init()
         }
     }
@@ -45,9 +44,6 @@ class LoginActivity : BaseMvvmActivity<ActivityLoginBinding, ScaleViewModel>() {
         show(this, 2000, notice!!)
     }
 
-    override fun loading(word: String?) {
-        show(this, 2000, word!!)
-    }
 
     override fun handleEvent(msg: MsgEvent) {
         super.handleEvent(msg)

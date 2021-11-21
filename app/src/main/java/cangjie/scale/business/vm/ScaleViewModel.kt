@@ -1,5 +1,6 @@
 package cangjie.scale.business.vm
 
+import android.util.Log
 import androidx.collection.arrayMapOf
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
@@ -7,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import cangjie.scale.business.base.ScaleApplication
 import cangjie.scale.business.base.http.Url
+import cangjie.scale.business.base.http.errorMsg
 import cangjie.scale.business.db.AppDatabase
 import cangjie.scale.business.db.SubmitOrder
 import cangjie.scale.business.db.SubmitRepository
@@ -18,6 +20,9 @@ import com.cangjie.frame.core.binding.BindingCommand
 import com.cangjie.frame.core.db.CangJie
 import com.cangjie.frame.core.event.MsgEvent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 /**
@@ -32,6 +37,7 @@ class ScaleViewModel : BaseScaleViewModel() {
     var updateData = MutableLiveData<Update>()
     var currentUnit = ObservableField("")
     private val books: LiveData<MutableList<SubmitOrder>>
+    var allUploadOrders = MutableLiveData<MutableList<SubmitOrder>>()
 
     var showStatusFiled = ObservableField(0)
 
@@ -222,6 +228,18 @@ class ScaleViewModel : BaseScaleViewModel() {
         val orderDao = AppDatabase.get(ScaleApplication.instance!!, viewModelScope).orderDao()
         bookRepository = SubmitRepository(orderDao)
         books = bookRepository.allOrders
+    }
+
+    fun getUpload() {
+        viewModelScope.launch(Dispatchers.IO) {
+            flow {
+                val booksDao = AppDatabase.get(ScaleApplication.instance!!).orderDao()
+                val orders = booksDao.getUpload()
+                emit(orders)
+            }.catch {
+                Log.e("info", it.errorMsg)
+            }.collect { allUploadOrders.postValue(it) }
+        }
     }
 
     fun add(book: SubmitOrder) = viewModelScope.launch(Dispatchers.IO) {

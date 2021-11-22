@@ -201,21 +201,10 @@ class MainActivity : BaseMvvmActivity<ActivityMainBinding, ScaleViewModel>() {
                 }
                 val bundle = Bundle()
                 bundle.putSerializable("orders", data)
-                UploadDialogFragment.newInstance(bundle)
-                    .setStandByCallback(object : UploadDialogFragment.StandByCallback {
-                        override fun upload(item: UploadTask) {
-                            val submitOrder =
-                                SubmitOrder(item.id, item.goodsId, item.batchId, item.batchPath, 2)
-                            val file = File(item.batchPath)
-                            contentResolver.delete(
-                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                MediaStore.Images.Media.DATA + "=?",
-                                arrayOf(item.batchPath)
-                            )
-                            file.delete()
-                            viewModel.update(submitOrder)
-                        }
-                    }).show(supportFragmentManager, "")
+                bundle.putInt("type", 1)
+                val intent = Intent(this@MainActivity, UploadImgActivity::class.java)
+                intent.putExtras(bundle)
+                startActivity(intent)
             }
         })
     }

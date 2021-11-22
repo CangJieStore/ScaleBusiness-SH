@@ -94,6 +94,11 @@
         <activity
             android:name=".ui.AdjustActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name="cangjie.scale.business.ui.UploadImgActivity"
+            android:theme="@style/DialogActivityTheme" />
+
+        <service android:name="cangjie.scale.business.service.UploadImgService" />
 
         <activity android:name="com.cangjie.frame.kit.update.activity.UpdateBackgroundActivity" />
         <activity

@@ -32,14 +32,6 @@ class ScaleApplication : Application() {
         setApplication(this)
         ToastUtils.init(this, BlackToastStyle())
         SerialPortUtilForScale.Instance().OpenSerialPort() //打开称重串口
-//        try {
-//            ScaleModule.Instance(this) //初始化称重模块
-//        } catch (e: java.lang.Exception) {
-//            e.printStackTrace()
-//            ViewUtils.runOnUiThread {
-//                ToastUtils.show("初始化称重主板错误！")
-//            }
-//        }
         UMConfigure.setLogEnabled(true);
         //友盟预初始化
         UMConfigure.preInit(this, "61951280e014255fcb7eff13", "ScalaBusiness")
